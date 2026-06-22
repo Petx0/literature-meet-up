@@ -1,0 +1,294 @@
+{
+  "story_state": {
+    "characters": [
+      {
+        "id": "char_fogg",
+        "canonical_name": "Phileas Fogg",
+        "aliases": [
+          "Mr. Fogg",
+          "Phileas Fogg"
+        ]
+      },
+      {
+        "id": "char_passepartout",
+        "canonical_name": "Jean Passepartout",
+        "aliases": [
+          "Passepartout",
+          "Jean",
+          "John"
+        ]
+      },
+      {
+        "id": "char_forster",
+        "canonical_name": "James Forster",
+        "aliases": [
+          "the dismissed servant"
+        ]
+      },
+      {
+        "id": "char_longferry",
+        "canonical_name": "Lord Longferry",
+        "aliases": [
+          "young Lord Longferry"
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "id": "loc_saville_row",
+        "canonical_name": "No. 7, Saville Row",
+        "hierarchy": {
+          "country": "England",
+          "region": null,
+          "city": "London",
+          "neighborhood": "Burlington Gardens",
+          "street": "Saville Row"
+        }
+      },
+      {
+        "id": "loc_reform_club",
+        "canonical_name": "Reform Club",
+        "hierarchy": {
+          "country": "England",
+          "city": "London",
+          "street": null,
+          "neighborhood": null,
+          "region": null
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "character_id": "char_fogg",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "region": null,
+          "city": "London",
+          "neighborhood": "Burlington Gardens",
+          "street": "Saville Row"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": 1872,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Fogg lives at No. 7 Saville Row and on the 2nd of October is seated in his armchair awaiting his new servant.",
+      "confidence": "explicit"
+    },
+    {
+      "character_id": "char_forster",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "region": null,
+          "city": "London",
+          "neighborhood": "Burlington Gardens",
+          "street": "Saville Row"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": 1872,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 2,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "James Forster, the dismissed servant, appears at the door to announce the new servant.",
+      "confidence": "explicit"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "region": null,
+          "city": "London",
+          "neighborhood": "Burlington Gardens",
+          "street": "Saville Row"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": 1872,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Passepartout arrives at the Saville Row house, is hired, and remains alone there after Fogg leaves.",
+      "confidence": "explicit"
+    },
+    {
+      "character_id": "char_fogg",
+      "location": {
+        "location_type": "real",
+        "source": "inferred",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "region": null,
+          "city": "London",
+          "neighborhood": null,
+          "street": null
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": 1872,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 4,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Fogg takes his hat and leaves, customarily departing for the Reform Club.",
+      "confidence": "inferred"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "city": "London",
+          "neighborhood": "Burlington Gardens",
+          "street": "Saville Row"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": null,
+        "hierarchy": {}
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 2,
+      "evidence_quote": "At half-past eleven Passepartout found himself alone in the house in Saville Row and inspected it.",
+      "confidence": "explicit"
+    },
+    {
+      "character_id": "char_fogg",
+      "location": {
+        "location_type": "real",
+        "source": "inferred",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "city": "London"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": null,
+        "hierarchy": {}
+      },
+      "sequence": {
+        "narration_order": 2,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "current",
+      "chapter": 2,
+      "evidence_quote": "Fogg leaves the house at half-past eleven for the Reform Club per his daily routine.",
+      "confidence": "inferred"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "area",
+        "hierarchy": {
+          "country": "France",
+          "city": "Paris"
+        }
+      },
+      "time": {
+        "source": "inferred",
+        "precision": null,
+        "hierarchy": {}
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "flashback",
+      "chapter": 2,
+      "evidence_quote": "Backstory recalls Passepartout was a true Parisian who abandoned his country for England and served in several houses.",
+      "confidence": "inferred"
+    },
+    {
+      "character_id": "char_longferry",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "proximity": "at",
+        "hierarchy": {
+          "country": "England",
+          "city": "London",
+          "neighborhood": "Haymarket"
+        }
+      },
+      "time": {
+        "source": "inferred",
+        "precision": null,
+        "hierarchy": {}
+      },
+      "sequence": {
+        "narration_order": 4,
+        "story_chronological_order": null
+      },
+      "temporal_relation": "flashback",
+      "chapter": 2,
+      "evidence_quote": "Passepartout's former master Lord Longferry passed nights in Haymarket taverns.",
+      "confidence": "explicit"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Literature Meet Up — Character Encounters</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Literature Meet Up</h1>
+    <p class="subtitle">Find characters from different novels who could have crossed paths.</p>
+
+    <div class="controls">
+      <label for="time-select">Time overlap</label>
+      <select id="time-select">
+        <option value="none">No time filter</option>
+        <option value="century">Same century</option>
+        <option value="decade">Same decade</option>
+        <option value="year" selected>Same year</option>
+        <option value="month">Same month</option>
+        <option value="day">Same day</option>
+      </select>
+
+      <label for="location-select">Location overlap</label>
+      <select id="location-select">
+        <option value="none">No location filter</option>
+        <option value="country">Same country</option>
+        <option value="region">Same region</option>
+        <option value="city" selected>Same city</option>
+        <option value="neighborhood">Same neighbourhood</option>
+      </select>
+
+      <button id="find-btn">Find an encounter</button>
+    </div>
+
+    <div id="result"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

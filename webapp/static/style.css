@@ -1,0 +1,114 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background: #f7f3ea;
+  color: #2b2620;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  color: #5a5142;
+  margin-top: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 1.5rem 0;
+  font-family: Arial, sans-serif;
+}
+
+.controls label {
+  font-weight: bold;
+}
+
+.controls select {
+  padding: 0.4rem;
+  font-size: 1rem;
+}
+
+#find-btn {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  background: #5a3e2b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#find-btn:hover {
+  background: #4a311f;
+}
+
+.status {
+  font-family: Arial, sans-serif;
+  color: #5a5142;
+}
+
+.status.error {
+  color: #a33;
+}
+
+.encounter {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.character {
+  flex: 1;
+  min-width: 260px;
+  background: white;
+  border: 1px solid #ddd3c0;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+}
+
+.character h2 {
+  margin: 0 0 0.2rem 0;
+}
+
+.character .book {
+  font-style: italic;
+  color: #5a5142;
+  margin: 0 0 0.6rem 0;
+}
+
+.character .location,
+.character .time {
+  margin: 0.2rem 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.95rem;
+}
+
+.character blockquote {
+  margin: 0.8rem 0 0 0;
+  padding-left: 0.8rem;
+  border-left: 3px solid #cabb9b;
+  color: #3a342b;
+  font-size: 0.95rem;
+}
+
+.vs {
+  align-self: center;
+  font-size: 1.5rem;
+  color: #aaa;
+}

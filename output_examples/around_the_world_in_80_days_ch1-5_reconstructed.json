@@ -1,0 +1,923 @@
+{
+  "story_state": {
+    "characters": [
+      {
+        "id": "char_phileas_fogg",
+        "canonical_name": "Phileas Fogg",
+        "aliases": [
+          "Mr. Fogg",
+          "Mr. Phileas Fogg"
+        ]
+      },
+      {
+        "id": "char_passepartout",
+        "canonical_name": "Jean Passepartout",
+        "aliases": [
+          "Passepartout",
+          "Jean",
+          "John"
+        ]
+      },
+      {
+        "id": "char_james_forster",
+        "canonical_name": "James Forster"
+      },
+      {
+        "id": "char_andrew_stuart",
+        "canonical_name": "Andrew Stuart",
+        "aliases": [
+          "Stuart"
+        ]
+      },
+      {
+        "id": "char_john_sullivan",
+        "canonical_name": "John Sullivan",
+        "aliases": [
+          "Sullivan"
+        ]
+      },
+      {
+        "id": "char_samuel_fallentin",
+        "canonical_name": "Samuel Fallentin",
+        "aliases": [
+          "Fallentin"
+        ]
+      },
+      {
+        "id": "char_thomas_flanagan",
+        "canonical_name": "Thomas Flanagan",
+        "aliases": [
+          "Flanagan"
+        ]
+      },
+      {
+        "id": "char_gauthier_ralph",
+        "canonical_name": "Gauthier Ralph",
+        "aliases": [
+          "Ralph"
+        ]
+      },
+      {
+        "id": "char_lord_albemarle",
+        "canonical_name": "Lord Albemarle"
+      },
+      {
+        "id": "char_rowan",
+        "canonical_name": "Rowan",
+        "aliases": [
+          "Commissioner of Police"
+        ]
+      },
+      {
+        "id": "char_fix",
+        "canonical_name": "Fix",
+        "aliases": [
+          "Fix, Detective"
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "id": "loc_saville_row",
+        "canonical_name": "No. 7 Saville Row",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_reform_club",
+        "canonical_name": "Reform Club",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_pall_mall",
+        "canonical_name": "Pall Mall",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_charing_cross",
+        "canonical_name": "Charing Cross Railway Station",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_sydenham",
+        "canonical_name": "Sydenham",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_scotland_yard",
+        "canonical_name": "Scotland Yard",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      {
+        "id": "loc_suez",
+        "canonical_name": "Suez",
+        "hierarchy": {
+          "city": "Suez"
+        }
+      },
+      {
+        "id": "loc_bombay",
+        "canonical_name": "Bombay",
+        "hierarchy": {
+          "city": "Bombay"
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": 1
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Fogg sits in his armchair at his Saville Row house on the 2nd of October, awaiting his new servant.",
+      "confidence": "explicit",
+      "event_id": "aw80d_1_char_phileas_fogg_1",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_james_forster",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 2,
+        "story_chronological_order": 2
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "The dismissed servant Forster appears at the door to announce the new servant.",
+      "confidence": "explicit",
+      "event_id": "aw80d_1_char_james_forster_2",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": 3
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Passepartout enters Fogg's house, is hired, and remains alone there after Fogg and Forster leave.",
+      "confidence": "explicit",
+      "event_id": "aw80d_1_char_passepartout_3",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "inferred",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 4,
+        "story_chronological_order": 4
+      },
+      "temporal_relation": "current",
+      "chapter": 1,
+      "evidence_quote": "Fogg puts on his hat and leaves the house, presumably heading to the Reform Club per his daily habit.",
+      "confidence": "inferred",
+      "event_id": "aw80d_1_char_phileas_fogg_4",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": 5
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "After his walk Fogg reaches the Reform Club in Pall Mall and dines, reads papers, and joins his whist partners; he dates the day as Wednesday the 2nd of October.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_phileas_fogg_1",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_andrew_stuart",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 2,
+        "story_chronological_order": 6
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "Stuart joins the others at the Reform Club fireplace and argues about the robbery and the wager.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_andrew_stuart_2",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_john_sullivan",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": 7
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "Sullivan is among Fogg's whist partners at the Reform Club and recites the travel estimate.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_john_sullivan_3",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_samuel_fallentin",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 4,
+        "story_chronological_order": 8
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "Fallentin partners Fogg at whist at the Reform Club and urges Stuart to calm down.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_samuel_fallentin_4",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_thomas_flanagan",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 5,
+        "story_chronological_order": 9
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "Flanagan, a brewer, is at the Reform Club fireplace and plays whist.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_thomas_flanagan_5",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_gauthier_ralph",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Pall Mall",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "year": null,
+          "month": 10,
+          "day": 2
+        }
+      },
+      "sequence": {
+        "narration_order": 6,
+        "story_chronological_order": 10
+      },
+      "temporal_relation": "current",
+      "chapter": 3,
+      "evidence_quote": "Ralph, a Bank of England director, is among the whist partners and argues the detectives will catch the thief.",
+      "confidence": "explicit",
+      "event_id": "aw80d_3_char_gauthier_ralph_6",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": 11
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Having won at whist, Fogg leaves the Reform Club at twenty-five past seven.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_phileas_fogg_1",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 2,
+        "story_chronological_order": 12
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg goes to his bedroom and tells Passepartout they will travel round the world.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_phileas_fogg_2",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "street": "Saville Row",
+          "neighborhood": "Burlington Gardens",
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": 13
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Passepartout, astonished, packs the carpet-bag at the Saville Row house.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_passepartout_3",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 4,
+        "story_chronological_order": 14
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "The cab stops at Charing Cross railway station at twenty past eight; Fogg gives alms and buys tickets.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_phileas_fogg_4",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 5,
+        "story_chronological_order": 15
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Passepartout follows his master at Charing Cross carrying the carpet-bag.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_passepartout_5",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_gauthier_ralph",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 6,
+        "story_chronological_order": 16
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg sees his five Reform friends at the station; Ralph speaks to him.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_gauthier_ralph_6",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_andrew_stuart",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 7,
+        "story_chronological_order": 17
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Stuart asks Fogg when he is due back in London.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_andrew_stuart_7",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_john_sullivan",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "inferred",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 8,
+        "story_chronological_order": 18
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg perceives his five friends of the Reform at the station.",
+      "confidence": "inferred",
+      "event_id": "aw80d_4_char_john_sullivan_8",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_samuel_fallentin",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "inferred",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 9,
+        "story_chronological_order": 19
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg perceives his five friends of the Reform at the station.",
+      "confidence": "inferred",
+      "event_id": "aw80d_4_char_samuel_fallentin_9",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_thomas_flanagan",
+      "location": {
+        "location_type": "real",
+        "proximity": "at",
+        "source": "inferred",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        }
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 10,
+        "story_chronological_order": 20
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg perceives his five friends of the Reform at the station.",
+      "confidence": "inferred",
+      "event_id": "aw80d_4_char_thomas_flanagan_10",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "transit",
+        "source": "stated",
+        "transit": {
+          "from": {
+            "city": "London",
+            "country": "England"
+          },
+          "to": {
+            "city": "Paris",
+            "country": "France"
+          }
+        },
+        "transport_mode": "train",
+        "transport_detail": "first-class railway carriage toward Dover and Calais"
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 11,
+        "story_chronological_order": 21
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Fogg and his servant take a first-class carriage; the train glides out and passes through Sydenham.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_phileas_fogg_11",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_passepartout",
+      "location": {
+        "location_type": "transit",
+        "source": "stated",
+        "transit": {
+          "from": {
+            "city": "London",
+            "country": "England"
+          },
+          "to": {
+            "city": "Paris",
+            "country": "France"
+          }
+        },
+        "transport_mode": "train",
+        "transport_detail": "first-class railway carriage toward Dover and Calais"
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "day": 2,
+          "month": 10,
+          "year": 1872
+        }
+      },
+      "sequence": {
+        "narration_order": 12,
+        "story_chronological_order": 22
+      },
+      "temporal_relation": "current",
+      "chapter": 4,
+      "evidence_quote": "Passepartout clings to the carpet-bag on the train and cries out passing through Sydenham about the gas.",
+      "confidence": "explicit",
+      "event_id": "aw80d_4_char_passepartout_12",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_phileas_fogg",
+      "location": {
+        "location_type": "ambiguous",
+        "source": "inferred",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        },
+        "proximity": "area"
+      },
+      "time": {
+        "source": "stated",
+        "precision": "month",
+        "hierarchy": {
+          "month": 10,
+          "day": 7,
+          "year": null
+        }
+      },
+      "sequence": {
+        "narration_order": 1,
+        "story_chronological_order": 23
+      },
+      "temporal_relation": "current",
+      "chapter": 5,
+      "evidence_quote": "Fogg's departure from London causes a sensation discussed in the press and clubs; he is the subject of bets but his own location this chapter is only referenced as having departed.",
+      "confidence": "inferred",
+      "event_id": "aw80d_5_char_phileas_fogg_1",
+      "ordering_confidence": "certain"
+    },
+    {
+      "character_id": "char_rowan",
+      "location": {
+        "location_type": "real",
+        "source": "stated",
+        "hierarchy": {
+          "city": "London",
+          "country": "England"
+        },
+        "proximity": "at",
+        "street": null
+      },
+      "time": {
+        "source": "stated",
+        "precision": "day",
+        "hierarchy": {
+          "month": 10,
+          "year": null
+        }
+      },
+      "sequence": {
+        "narration_order": 3,
+        "story_chronological_order": 24
+      },
+      "temporal_relation": "current",
+      "chapter": 5,
+      "evidence_quote": "The commissioner of police was sitting in his office at nine o'clock one evening when a telegram was handed to him.",
+      "confidence": "explicit",
+      "event_id": "aw80d_5_char_rowan_3",
+      "ordering_confidence": "uncertain"
+    }
+  ]
+}
