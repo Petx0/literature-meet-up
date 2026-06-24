@@ -674,14 +674,13 @@ is a subset of, not dependent on, the cleanup criteria in step 3).
 ## Still open
 
 Carried forward and resolved/updated across later addenda — see
-`ADDENDUM_2_pipeline_state_management.md` onward for what followed this document.
+Addendum 2 onward for what followed this document.
 
 ---
 
 # Project Brief Addendum 2 — Pipeline State Management
 
-Extends `PROJECT_BRIEF.md` and `ADDENDUM_1_chronological_reconstruction.md`. Read after
-both — assumes that context.
+Extends the Project Brief and Addendum 1 above. Read after both — assumes that context.
 
 ---
 
@@ -706,9 +705,9 @@ Concretely, the in-memory lifecycle for a single book run is:
    characters, locations, and the surviving events for this book.
 
 (Subsequent addenda add further in-memory stages — location dedup, geocoding backfill —
-that also run before this single DB write. See `ADDENDUM_3_location_dedup.md` and
-`ADDENDUM_4_geocoding_backfill.md`. This document describes the governing principle;
-later documents extend the in-memory pipeline further without changing it.)
+that also run before this single DB write. See Addendum 3 and Addendum 4 below. This
+document describes the governing principle; later documents extend the in-memory
+pipeline further without changing it.)
 
 ---
 
@@ -753,9 +752,9 @@ Because of this, the database schema only needs to model the **final, clean stat
 
 ## Still open
 
-- Geocoding / hierarchy backfill — see `ADDENDUM_4_geocoding_backfill.md`.
+- Geocoding / hierarchy backfill — see Addendum 4 below.
 - Validation pass for entity duplication (characters) — not yet designed.
-- `new_locations` granularity / dedup — see `ADDENDUM_3_location_dedup.md`.
+- `new_locations` granularity / dedup — see Addendum 3 below.
 - Database schema for storage — now well-scoped per the consequences above; a
   reasonable next design pass once dedup and geocoding are finalized.
 - End consumer / query interface — still deferred.
@@ -764,8 +763,7 @@ Because of this, the database schema only needs to model the **final, clean stat
 
 # Project Brief Addendum 3 — Location Deduplication
 
-Extends `PROJECT_BRIEF.md`, `ADDENDUM_1_chronological_reconstruction.md`, and
-`ADDENDUM_2_pipeline_state_management.md`. Read after all three — assumes that context.
+Extends the Project Brief and Addenda 1–2 above. Read after all three — assumes that context.
 
 ---
 
@@ -891,7 +889,7 @@ this book is finalized, ready for geocoding backfill (next stage) and then DB wr
 
 ## Still open
 
-- Geocoding backfill (see `ADDENDUM_4_geocoding_backfill.md` — addresses historical
+- Geocoding backfill (see Addendum 4 below — addresses historical
   accuracy considerations, e.g. resolving a 1980s-set location to "Yugoslavia" rather
   than the modern "Serbia," flagged in planning as a real consideration).
 - Entity-duplication validation pass for characters (separate from this — this document
@@ -904,9 +902,7 @@ this book is finalized, ready for geocoding backfill (next stage) and then DB wr
 
 # Project Brief Addendum 4 — Geocoding Backfill
 
-Extends `PROJECT_BRIEF.md`, `ADDENDUM_1_chronological_reconstruction.md`,
-`ADDENDUM_2_pipeline_state_management.md`, and `ADDENDUM_3_location_dedup.md`. Read
-after all four — assumes that context.
+Extends the Project Brief and Addenda 1–3 above. Read after all four — assumes that context.
 
 ---
 

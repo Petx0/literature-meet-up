@@ -2,4 +2,12 @@
 __pycache__/
 *.pyc
 .DS_Store
-.claude/
+
+# Ignore everything under .claude/ by default (local caches, scheduled-task
+# state, personal settings overrides) except the project-shared config that's
+# meant to ship with the repo: hooks, skills, custom agents, and settings.json.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/skills/
+!.claude/agents/

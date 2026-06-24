@@ -91,6 +91,8 @@ each one assumes the ones before it).
 - `test_corpus.md` — a curated list of 13 Gutenberg novels chosen for being
   rich in named real-world locations, used to stress-test the pipeline.
 - `PROJECT_BRIEF.md` — the full design document.
+- `CLAUDE.md` — working instructions for Claude Code instances operating in
+  this repo (commands, architecture notes); not meant for human onboarding.
 
 ## The data model
 
@@ -152,10 +154,15 @@ and overridable per-environment via env vars without touching code:
 
 | Env var | Default | Called |
 |---|---|---|
-| `EXTRACTION_MODEL` | `claude-opus-4-8` | once per chapter |
+| `EXTRACTION_MODEL` | `claude-sonnet-4-6` | once per chapter |
 | `RECONSTRUCTION_MODEL` | `claude-haiku-4-5` | once per book |
 | `SETTING_ESTIMATION_MODEL` | `claude-opus-4-8` | once per book |
 | `CHARACTER_DEDUP_MODEL` | `claude-opus-4-8` | once per book |
+
+Extraction defaults to Sonnet rather than Opus because it's the only stage
+that scales with chapter count, making it the most cost-sensitive one — see
+`model_config.py`'s docstring for the full rationale (including its
+interaction with prompt caching).
 
 ## Running the web app locally
 
