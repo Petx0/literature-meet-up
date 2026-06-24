@@ -95,42 +95,71 @@ join characters c on c.id = e.character_id
 join locations l on l.id = e.location_id;
 
 
+-- All three examples below aggregate raw event-pairs into one row per
+-- distinct "encounter" (same two characters, same displayed location, same
+-- displayed time) via DISTINCT ON, with support_count showing how many raw
+-- event-pairs back that encounter - without this, a character with many
+-- qualifying events would show up as many near-duplicate rows. If you adapt
+-- these into a much looser combo (e.g. no location/time filter at all) and
+-- it errors out on disk space, add `and random() < 0.05` (or similar) to the
+-- WHERE clause to sample the candidate pool before the aggregation step -
+-- see MAX_CANDIDATE_POOL handling in literature_meetup/encounter_queries.py
+-- for the same fix done dynamically based on an actual row-count check.
+
 -- ----------------------------------------------------------------------------
 -- EXAMPLE 1: same city + same year (a practical, moderately strict combo)
 -- ----------------------------------------------------------------------------
-select distinct
-    r1.character_name as character_a, r1.book_title as book_a, r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
-    r2.character_name as character_b, r2.book_title as book_b, r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
-from event_match_points p1
-join event_match_points p2 on p1.book_id < p2.book_id
-join event_readable r1 on r1.event_id = p1.event_id
-join event_readable r2 on r2.event_id = p2.event_id
-where
-    -- same year (range-overlap, generous toward book-estimated ranges)
-    p1.y_start <= p2.y_end and p2.y_start <= p1.y_end
-    -- same city (and country must agree too, if both happen to specify it)
-    and p1.city is not null and p2.city is not null and p1.city = p2.city
-    and (p1.country is null or p2.country is null or p1.country = p2.country)
-order by r1.book_title, r2.book_title
+with raw_pairs as (
+    select
+        p1.character_id as character_a_id, r1.character_name as character_a, r1.book_title as book_a,
+        r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
+        p2.character_id as character_b_id, r2.character_name as character_b, r2.book_title as book_b,
+        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+    from event_match_points p1
+    join event_match_points p2 on p1.book_id < p2.book_id
+    join event_readable r1 on r1.event_id = p1.event_id
+    join event_readable r2 on r2.event_id = p2.event_id
+    where
+        -- same year (range-overlap, generous toward book-estimated ranges)
+        p1.y_start <= p2.y_end and p2.y_start <= p1.y_end
+        -- same city (and country must agree too, if both happen to specify it)
+        and p1.city is not null and p2.city is not null and p1.city = p2.city
+        and (p1.country is null or p2.country is null or p1.country = p2.country)
+)
+select distinct on (character_a_id, character_b_id, location_a, time_a, location_b, time_b)
+    character_a, book_a, location_a, time_a, evidence_a,
+    character_b, book_b, location_b, time_b, evidence_b,
+    count(*) over (partition by character_a_id, character_b_id, location_a, time_a, location_b, time_b) as support_count
+from raw_pairs
+order by character_a_id, character_b_id, location_a, time_a, location_b, time_b, random()
 limit 25;
 
 
 -- ----------------------------------------------------------------------------
 -- EXAMPLE 2: same country + same decade (broader - more results expected)
 -- ----------------------------------------------------------------------------
-select distinct
-    r1.character_name as character_a, r1.book_title as book_a, r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
-    r2.character_name as character_b, r2.book_title as book_b, r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
-from event_match_points p1
-join event_match_points p2 on p1.book_id < p2.book_id
-join event_readable r1 on r1.event_id = p1.event_id
-join event_readable r2 on r2.event_id = p2.event_id
-where
-    -- same decade (10-year buckets, range-overlap)
-    floor(p1.y_start / 10.0) <= floor(p2.y_end / 10.0) and floor(p2.y_start / 10.0) <= floor(p1.y_end / 10.0)
-    -- same country
-    and p1.country is not null and p2.country is not null and p1.country = p2.country
-order by r1.book_title, r2.book_title
+with raw_pairs as (
+    select
+        p1.character_id as character_a_id, r1.character_name as character_a, r1.book_title as book_a,
+        r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
+        p2.character_id as character_b_id, r2.character_name as character_b, r2.book_title as book_b,
+        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+    from event_match_points p1
+    join event_match_points p2 on p1.book_id < p2.book_id
+    join event_readable r1 on r1.event_id = p1.event_id
+    join event_readable r2 on r2.event_id = p2.event_id
+    where
+        -- same decade (10-year buckets, range-overlap)
+        floor(p1.y_start / 10.0) <= floor(p2.y_end / 10.0) and floor(p2.y_start / 10.0) <= floor(p1.y_end / 10.0)
+        -- same country
+        and p1.country is not null and p2.country is not null and p1.country = p2.country
+)
+select distinct on (character_a_id, character_b_id, location_a, time_a, location_b, time_b)
+    character_a, book_a, location_a, time_a, evidence_a,
+    character_b, book_b, location_b, time_b, evidence_b,
+    count(*) over (partition by character_a_id, character_b_id, location_a, time_a, location_b, time_b) as support_count
+from raw_pairs
+order by character_a_id, character_b_id, location_a, time_a, location_b, time_b, random()
 limit 25;
 
 
@@ -140,21 +169,30 @@ limit 25;
 -- this demonstrates the "generous" wildcard behavior: events with no month
 -- data don't get excluded, they just don't add evidence either way)
 -- ----------------------------------------------------------------------------
-select distinct
-    r1.character_name as character_a, r1.book_title as book_a, r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
-    r2.character_name as character_b, r2.book_title as book_b, r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
-from event_match_points p1
-join event_match_points p2 on p1.book_id < p2.book_id
-join event_readable r1 on r1.event_id = p1.event_id
-join event_readable r2 on r2.event_id = p2.event_id
-where
-    -- same year and same month-or-unknown
-    p1.y_start <= p2.y_end and p2.y_start <= p1.y_end
-    and (p1.time_month is null or p2.time_month is null or p1.time_month = p2.time_month)
-    -- same neighborhood (forces city/region/country to agree too, where known)
-    and p1.neighborhood is not null and p2.neighborhood is not null and p1.neighborhood = p2.neighborhood
-    and (p1.city is null or p2.city is null or p1.city = p2.city)
-    and (p1.region is null or p2.region is null or p1.region = p2.region)
-    and (p1.country is null or p2.country is null or p1.country = p2.country)
-order by r1.book_title, r2.book_title
+with raw_pairs as (
+    select
+        p1.character_id as character_a_id, r1.character_name as character_a, r1.book_title as book_a,
+        r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
+        p2.character_id as character_b_id, r2.character_name as character_b, r2.book_title as book_b,
+        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+    from event_match_points p1
+    join event_match_points p2 on p1.book_id < p2.book_id
+    join event_readable r1 on r1.event_id = p1.event_id
+    join event_readable r2 on r2.event_id = p2.event_id
+    where
+        -- same year and same month-or-unknown
+        p1.y_start <= p2.y_end and p2.y_start <= p1.y_end
+        and (p1.time_month is null or p2.time_month is null or p1.time_month = p2.time_month)
+        -- same neighborhood (forces city/region/country to agree too, where known)
+        and p1.neighborhood is not null and p2.neighborhood is not null and p1.neighborhood = p2.neighborhood
+        and (p1.city is null or p2.city is null or p1.city = p2.city)
+        and (p1.region is null or p2.region is null or p1.region = p2.region)
+        and (p1.country is null or p2.country is null or p1.country = p2.country)
+)
+select distinct on (character_a_id, character_b_id, location_a, time_a, location_b, time_b)
+    character_a, book_a, location_a, time_a, evidence_a,
+    character_b, book_b, location_b, time_b, evidence_b,
+    count(*) over (partition by character_a_id, character_b_id, location_a, time_a, location_b, time_b) as support_count
+from raw_pairs
+order by character_a_id, character_b_id, location_a, time_a, location_b, time_b, random()
 limit 25;

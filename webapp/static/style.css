@@ -112,3 +112,12 @@ h1 {
   font-size: 1.5rem;
   color: #aaa;
 }
+
+.support-count {
+  width: 100%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  color: #8a8070;
+  margin-top: 0.8rem;
+}

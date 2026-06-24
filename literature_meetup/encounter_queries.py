@@ -85,18 +85,50 @@ join characters c on c.id = e.character_id
 join locations l on l.id = e.location_id;
 """
 
-ENCOUNTER_QUERY_TEMPLATE = """
-select
-    r1.character_name as character_a, r1.book_title as book_a,
-    r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
-    r2.character_name as character_b, r2.book_title as book_b,
-    r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+COUNT_QUERY_TEMPLATE = """
+select count(*)
 from event_match_points p1
 join event_match_points p2 on p1.book_id < p2.book_id
-join event_readable r1 on r1.event_id = p1.event_id
-join event_readable r2 on r2.event_id = p2.event_id
 where {time_condition}
   and {location_condition}
+"""
+
+# Caps the candidate pool feeding the grouping/sort step in
+# ENCOUNTER_QUERY_TEMPLATE below. Loose filters (e.g. no time or location
+# filter at all) can produce millions of raw event-pairs; DISTINCT ON's
+# required sort over that many rows exhausted the DB's temp disk space in
+# practice. See random_encounter() for how this is applied as a cheap,
+# sort-free Bernoulli filter rather than ORDER BY random() LIMIT N (the
+# latter still requires fully sorting the unbounded set before taking the
+# top N, which is exactly what caused the disk-full).
+MAX_CANDIDATE_POOL = 20000
+
+ENCOUNTER_QUERY_TEMPLATE = """
+with raw_pairs as (
+    select
+        p1.character_id as character_a_id, r1.character_name as character_a, r1.book_title as book_a,
+        r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
+        p2.character_id as character_b_id, r2.character_name as character_b, r2.book_title as book_b,
+        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+    from event_match_points p1
+    join event_match_points p2 on p1.book_id < p2.book_id
+    join event_readable r1 on r1.event_id = p1.event_id
+    join event_readable r2 on r2.event_id = p2.event_id
+    where {time_condition}
+      and {location_condition}
+      and {sample_condition}
+),
+grouped as (
+    select distinct on (character_a_id, character_b_id, location_a, time_a, location_b, time_b)
+        character_a, book_a, location_a, time_a, evidence_a,
+        character_b, book_b, location_b, time_b, evidence_b,
+        count(*) over (
+            partition by character_a_id, character_b_id, location_a, time_a, location_b, time_b
+        ) as support_count
+    from raw_pairs
+    order by character_a_id, character_b_id, location_a, time_a, location_b, time_b, random()
+)
+select * from grouped
 order by random()
 limit 1
 """
@@ -153,10 +185,29 @@ def random_encounter(conn, time_granularity: str, location_granularity: str) -> 
     an unrecognized granularity (callers should validate against
     TIME_GRANULARITIES/LOCATION_GRANULARITIES before calling, e.g. to turn
     that into a clean 400 at an API boundary).
+
+    Event-pairs are grouped by (character pair, displayed location, displayed
+    time) before sampling - a character with many qualifying events would
+    otherwise both dominate the random draw and show up as many near-duplicate
+    "encounters". The returned dict's `support_count` is how many raw
+    event-pairs collapsed into the one returned, as a rough confidence signal.
     """
+    time_condition = _time_condition(time_granularity)
+    location_condition = _location_condition(location_granularity)
+
+    with conn.cursor() as cur:
+        cur.execute(COUNT_QUERY_TEMPLATE.format(time_condition=time_condition, location_condition=location_condition))
+        candidate_count = cur.fetchone()[0]
+
+    if candidate_count > MAX_CANDIDATE_POOL:
+        sample_condition = f"random() < {MAX_CANDIDATE_POOL / candidate_count}"
+    else:
+        sample_condition = "true"
+
     sql = ENCOUNTER_QUERY_TEMPLATE.format(
-        time_condition=_time_condition(time_granularity),
-        location_condition=_location_condition(location_granularity),
+        time_condition=time_condition,
+        location_condition=location_condition,
+        sample_condition=sample_condition,
     )
     with conn.cursor() as cur:
         cur.execute(sql)

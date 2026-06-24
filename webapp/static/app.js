@@ -18,12 +18,17 @@ function renderEncounter(encounter) {
     </div>
   `;
 
+  const supportNote = encounter.support_count > 1
+    ? `<p class="support-count">Supported by ${encounter.support_count} pieces of evidence.</p>`
+    : "";
+
   resultDiv.innerHTML = `
     <div class="encounter">
       ${side(encounter.character_a, encounter.book_a, encounter.location_a, encounter.time_a, encounter.evidence_a)}
       <div class="vs">&times;</div>
       ${side(encounter.character_b, encounter.book_b, encounter.location_b, encounter.time_b, encounter.evidence_b)}
     </div>
+    ${supportNote}
   `;
 }
 
