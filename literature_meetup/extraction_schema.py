@@ -122,14 +122,6 @@ RECORD_CHAPTER_EVENTS_TOOL = {
                             },
                             "required": ["source"],
                         },
-                        "sequence": {
-                            "type": "object",
-                            "properties": {
-                                "narration_order": {"type": "integer"},
-                                "story_chronological_order": {"type": ["integer", "null"]},
-                            },
-                            "required": ["narration_order"],
-                        },
                         "temporal_relation": {
                             "type": "string",
                             "enum": ["current", "flashback", "flash_forward", "unclear"],
@@ -145,7 +137,6 @@ RECORD_CHAPTER_EVENTS_TOOL = {
                         "character_id",
                         "location",
                         "time",
-                        "sequence",
                         "temporal_relation",
                         "chapter",
                         "evidence_quote",

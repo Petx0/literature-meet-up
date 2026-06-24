@@ -20,7 +20,14 @@ import anthropic
 from literature_meetup import fetch_novel_by_id, get_connection, process_book, save_book
 from literature_meetup import usage_tracker
 
-CHAPTER_CAP = 10
+# No per-book chapter cap in production - process every chapter Gutendex returns.
+# MAX_CHAPTERS is a separate, unrelated guard: skip a novel outright (no Claude
+# API calls at all) if it's longer than this many chapters, since extraction
+# cost scales linearly with chapter count and a few outliers in this corpus
+# (Les Miserables: 365 chapters, ~6x the next-longest book) would dominate a
+# batch run's cost. Override via the MAX_CHAPTERS env var if you want to
+# process a skipped book anyway.
+MAX_CHAPTERS = int(os.environ.get("MAX_CHAPTERS", "120"))
 
 # (gutenberg_id, title) in test_corpus.md's recommended processing order.
 CORPUS = [
@@ -46,15 +53,14 @@ def already_processed(conn, gutenberg_id: int) -> bool:
         return cur.fetchone() is not None
 
 
-def process_one(gutenberg_id: int, title: str) -> dict:
+def process_one(novel: dict, gutenberg_id: int) -> dict:
     usage_tracker.reset()
     start = time.monotonic()
 
-    novel = fetch_novel_by_id(gutenberg_id)
-    chapters = novel["chapters"][:CHAPTER_CAP]
+    chapters = novel["chapters"]
     print(
         f"  Fetched: {novel['metadata']['title']!r} by {novel['metadata']['author']} "
-        f"({len(novel['chapters'])} chapters total, using first {len(chapters)})"
+        f"({len(chapters)} chapters)"
     )
 
     client = anthropic.Anthropic()
@@ -103,8 +109,17 @@ def main():
             summary.append({"title": title, "status": "skipped", "elapsed_seconds": None, "cost": None})
             continue
 
+        novel = fetch_novel_by_id(gutenberg_id)
+        chapter_count = len(novel["chapters"])
+        if chapter_count > MAX_CHAPTERS:
+            print(f"  Skipping - {chapter_count} chapters exceeds MAX_CHAPTERS={MAX_CHAPTERS}.")
+            summary.append(
+                {"title": title, "status": f"skipped: too long ({chapter_count} chapters)", "elapsed_seconds": None, "cost": None}
+            )
+            continue
+
         try:
-            summary.append(process_one(gutenberg_id, title))
+            summary.append(process_one(novel, gutenberg_id))
         except Exception as exc:
             print(f"  ERROR: {exc!r} - skipping to next book.")
             summary.append({"title": title, "status": f"failed: {exc!r}", "elapsed_seconds": None, "cost": None})

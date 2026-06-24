@@ -90,8 +90,7 @@ def analyze_book(client, chapters: list[dict], book_id: str | None = None) -> di
 
         for narration_order, event in enumerate(result.get("events", []), start=1):
             event["chapter"] = chapter_number
-            event["sequence"]["narration_order"] = narration_order
-            event["sequence"]["story_chronological_order"] = None
+            event["sequence"] = {"narration_order": narration_order, "story_chronological_order": None}
             id_prefix = book_id or "book"
             event["event_id"] = f"{id_prefix}_{chapter_number}_{event['character_id']}_{narration_order}"
 

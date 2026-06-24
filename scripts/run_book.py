@@ -18,19 +18,33 @@ import anthropic
 from literature_meetup import fetch_novel, get_connection, process_book, save_book
 from literature_meetup import usage_tracker
 
-CHAPTER_CAP = 10
+# No per-book chapter cap in production - process every chapter Gutendex
+# returns. MAX_CHAPTERS is a separate guard: refuse to run a novel longer
+# than this many chapters without an explicit override, since extraction
+# cost scales linearly with chapter count and a single very long novel
+# (e.g. Les Miserables: 365 chapters) could rack up unexpected cost on a
+# single manual invocation. Override with MAX_CHAPTERS=<n> in the
+# environment, or pass --force as a third CLI arg, to process it anyway.
+MAX_CHAPTERS = int(os.environ.get("MAX_CHAPTERS", "120"))
 
 
 def main():
     title, author = sys.argv[1], sys.argv[2]
+    force = len(sys.argv) > 3 and sys.argv[3] == "--force"
 
     usage_tracker.reset()
 
     novel = fetch_novel(title, author)
-    chapters = novel["chapters"][:CHAPTER_CAP]
+    chapters = novel["chapters"]
     print(f"Fetched: {novel['metadata']['title']!r} by {novel['metadata']['author']} "
-          f"(gutenberg_id={novel['metadata']['gutenberg_id']}, {len(novel['chapters'])} chapters total, "
-          f"using first {len(chapters)})")
+          f"(gutenberg_id={novel['metadata']['gutenberg_id']}, {len(chapters)} chapters)")
+
+    if len(chapters) > MAX_CHAPTERS and not force:
+        print(
+            f"Refusing to process: {len(chapters)} chapters exceeds MAX_CHAPTERS={MAX_CHAPTERS}. "
+            "Re-run with a third argument --force, or set MAX_CHAPTERS in the environment, to proceed anyway."
+        )
+        return
 
     client = anthropic.Anthropic()
     result = process_book(client, chapters, metadata=novel["metadata"], book_id=str(novel["metadata"]["gutenberg_id"]))
@@ -53,7 +67,10 @@ def main():
     for model, bucket in cost_summary["by_model"].items():
         print(
             f"  {model}: {bucket['calls']} call(s), "
-            f"{bucket['input_tokens']} input tok, {bucket['output_tokens']} output tok, "
+            f"{bucket['input_tokens']} input tok, "
+            f"{bucket['cache_creation_input_tokens']} cache-write tok, "
+            f"{bucket['cache_read_input_tokens']} cache-read tok, "
+            f"{bucket['output_tokens']} output tok, "
             f"${bucket['cost']:.4f}"
         )
 
