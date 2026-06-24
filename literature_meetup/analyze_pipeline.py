@@ -5,13 +5,24 @@ from literature_meetup.story_state import merge_chapter_result, new_story_state
 
 
 def _normalize_new_characters(result: dict, chapter_number: int) -> None:
-    """Defends against another observed model failure mode: an item in
-    new_characters coming back as a bare string (just the id/name) instead of
-    the required {id, canonical_name, aliases} object, despite the tool
-    schema declaring object items. Promotes any such string into a minimal
-    valid record rather than crashing downstream on dict-only access.
+    """Defends against observed model failure modes around new_characters:
+    (a) the whole field coming back as a bare string instead of an array at
+    all (worse than (b) below - iterating it character-by-character and then
+    trying list-item-assignment on an immutable string crashes outright), and
+    (b) an individual item being a bare string (just the id/name) instead of
+    the required {id, canonical_name, aliases} object. Both are normalized
+    away rather than crashing downstream on dict-only access.
     """
     new_characters = result.get("new_characters", [])
+    if not isinstance(new_characters, list):
+        print(
+            f"Chapter {chapter_number}: new_characters was a {type(new_characters).__name__}, "
+            "not an array at all - discarding it (any character_id an event still needs will be "
+            "auto-placeholdered by the orphan-reference check)."
+        )
+        result["new_characters"] = []
+        return
+
     for i, character in enumerate(new_characters):
         if isinstance(character, str):
             print(

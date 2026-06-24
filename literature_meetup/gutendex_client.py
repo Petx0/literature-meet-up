@@ -35,6 +35,17 @@ def search_books(title: str, author: str) -> list[dict]:
     return books
 
 
+def get_book_by_id(gutenberg_id: int) -> dict:
+    """Fetches a single book directly by its Gutenberg id, bypassing title/
+    author search entirely. Preferred over search_books when the exact id is
+    already known (e.g. a curated test corpus) - search has been observed to
+    miss matches on accented author names and similar title-matching quirks.
+    """
+    response = requests.get(f"{GUTENDEX_BASE_URL}/{gutenberg_id}", timeout=10)
+    response.raise_for_status()
+    return response.json()
+
+
 def pick_best_edition(books: list[dict]) -> dict:
     """English-first, then most downloaded; falls back to most downloaded overall."""
     if not books:
