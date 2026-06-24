@@ -8,6 +8,23 @@ from literature_meetup.model_config import CHARACTER_DEDUP_MODEL as MODEL
 from literature_meetup.usage_tracker import record as record_usage
 
 
+MAX_EVIDENCE_EVENTS_PER_CHARACTER = 10
+
+
+def _sample_events(character_events: list[dict]) -> list[dict]:
+    """Caps how many of a character's events get sent as dedup evidence.
+    A handful is enough to judge identity (the first appearance plus a few
+    more to confirm continuity) - sending every event for a character with
+    dozens of appearances wastes tokens for no real gain in judgment
+    quality. Keeps the first and last halves so both the introduction and
+    the most recent occurrences are represented.
+    """
+    if len(character_events) <= MAX_EVIDENCE_EVENTS_PER_CHARACTER:
+        return character_events
+    half = MAX_EVIDENCE_EVENTS_PER_CHARACTER // 2
+    return character_events[:half] + character_events[-half:]
+
+
 def _build_character_context(characters: list[dict], events: list[dict]) -> list[dict]:
     events_by_character: dict[str, list[dict]] = {}
     for event in events:
@@ -15,7 +32,7 @@ def _build_character_context(characters: list[dict], events: list[dict]) -> list
 
     context = []
     for character in characters:
-        character_events = events_by_character.get(character["id"], [])
+        character_events = _sample_events(events_by_character.get(character["id"], []))
         context.append(
             {
                 "id": character["id"],
@@ -48,10 +65,10 @@ def detect_character_duplicates(client, characters: list[dict], events: list[dic
     response = client.messages.create(
         model=MODEL,
         max_tokens=4000,
-        system=CHARACTER_DEDUP_SYSTEM_PROMPT,
+        system=[{"type": "text", "text": CHARACTER_DEDUP_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
         tools=[FLAG_CHARACTER_DUPLICATES_TOOL],
         tool_choice={"type": "tool", "name": "flag_character_duplicates"},
-        messages=[{"role": "user", "content": json.dumps(context, indent=2)}],
+        messages=[{"role": "user", "content": json.dumps(context, separators=(",", ":"))}],
     )
 
     record_usage(MODEL, response.usage)

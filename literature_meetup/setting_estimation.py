@@ -39,7 +39,7 @@ def estimate_book_setting(client, metadata: dict, chapters: list[dict]) -> dict:
     response = client.messages.create(
         model=MODEL,
         max_tokens=2000,
-        system=SETTING_ESTIMATION_SYSTEM_PROMPT,
+        system=[{"type": "text", "text": SETTING_ESTIMATION_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
         tools=[ESTIMATE_BOOK_SETTING_TOOL],
         tool_choice={"type": "tool", "name": "estimate_book_setting"},
         messages=[{"role": "user", "content": user_content}],

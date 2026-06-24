@@ -41,10 +41,10 @@ def reconstruct_chronology(client, events: list[dict]) -> list[dict]:
     response = client.messages.create(
         model=MODEL,
         max_tokens=8000,
-        system=RECONSTRUCTION_SYSTEM_PROMPT,
+        system=[{"type": "text", "text": RECONSTRUCTION_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
         tools=[ASSIGN_CHRONOLOGICAL_ORDER_TOOL],
         tool_choice={"type": "tool", "name": "assign_chronological_order"},
-        messages=[{"role": "user", "content": json.dumps(payload, indent=2)}],
+        messages=[{"role": "user", "content": json.dumps(payload, separators=(",", ":"))}],
     )
 
     record_usage(MODEL, response.usage)

@@ -7,20 +7,29 @@ are also the recommended setting for each stage.
 
 | Stage                          | Env var / constant         | Default            | Why this tier                                          |
 |---------------------------------|-----------------------------|---------------------|----------------------------------------------------------|
-| Chapter extraction               | EXTRACTION_MODEL            | claude-opus-4-8     | Real narrative judgment - entity resolution, transit vs. |
-|                                  |                              |                     | stationary, source/confidence flags.                     |
+| Chapter extraction               | EXTRACTION_MODEL            | claude-sonnet-4-6   | Runs once PER CHAPTER - the only stage that scales with  |
+|                                  |                              |                     | book length, so it's the most cost-sensitive one.        |
+|                                  |                              |                     | Sonnet-tier quality has been empirically validated on    |
+|                                  |                              |                     | this task; reserve Opus spend for the low-volume,        |
+|                                  |                              |                     | judgment-heavy single calls below instead. Also large    |
+|                                  |                              |                     | enough (combined with the tool schema) to clear Sonnet's |
+|                                  |                              |                     | prompt-caching minimum (2048 tokens) - Opus's minimum is  |
+|                                  |                              |                     | 4096, which this prompt would NOT reach, silently         |
+|                                  |                              |                     | disabling the cache_control breakpoint in                |
+|                                  |                              |                     | chapter_analyzer.py.                                      |
 | Chronological reconstruction     | RECONSTRUCTION_MODEL        | claude-haiku-4-5    | Structured-in/structured-out sorting over already-       |
 |                                  |                              |                     | extracted data, not prose - cheaper model suffices       |
 |                                  |                              |                     | (Addendum 1).                                            |
 | Book-setting estimation          | SETTING_ESTIMATION_MODEL    | claude-opus-4-8     | Reads text cues and cross-references metadata - needs    |
-|                                  |                              |                     | real judgment.                                           |
+|                                  |                              |                     | real judgment. Runs once per book, so the tier cost is    |
+|                                  |                              |                     | bounded regardless of book length.                        |
 | Character duplication detection  | CHARACTER_DEDUP_MODEL       | claude-opus-4-8     | Narrative judgment about behavior/continuity, not string |
-|                                  |                              |                     | matching (Addendum 7).                                   |
+|                                  |                              |                     | matching (Addendum 7). Also once per book.                |
 """
 
 import os
 
-DEFAULT_EXTRACTION_MODEL = "claude-opus-4-8"
+DEFAULT_EXTRACTION_MODEL = "claude-sonnet-4-6"
 DEFAULT_RECONSTRUCTION_MODEL = "claude-haiku-4-5"
 DEFAULT_SETTING_ESTIMATION_MODEL = "claude-opus-4-8"
 DEFAULT_CHARACTER_DEDUP_MODEL = "claude-opus-4-8"

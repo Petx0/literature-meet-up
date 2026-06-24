@@ -11,14 +11,14 @@ def analyze_chapter(client, chapter_text: str, story_state: dict, chapter_number
     record_chapter_events tool input: {new_characters, new_locations, events}.
     """
     user_content = (
-        f"## Story state so far\n{json.dumps(story_state, indent=2)}\n\n"
+        f"## Story state so far\n{json.dumps(story_state, separators=(',', ':'))}\n\n"
         f"## Chapter {chapter_number}\n{chapter_text}"
     )
 
     response = client.messages.create(
         model=MODEL,
         max_tokens=8000,
-        system=SYSTEM_PROMPT,
+        system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
         tools=[RECORD_CHAPTER_EVENTS_TOOL],
         tool_choice={"type": "tool", "name": "record_chapter_events"},
         messages=[{"role": "user", "content": user_content}],
