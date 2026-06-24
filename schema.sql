@@ -214,6 +214,37 @@ comment on column events.story_chronological_order is
    (b) events whose only date is book_estimated (Addendum 5 — these intentionally
    never receive a chronological order, only a rough era).';
 
+-- ----------------------------------------------------------------------------
+-- CHARACTER DUPLICATE FLAGS
+-- Per Addendum 7: only `certain`-confidence duplicate groups are auto-merged
+-- at pipeline time. `likely`/`uncertain` groups are persisted here instead of
+-- being printed and discarded, so they can actually be reviewed and acted on
+-- (see scripts/review_duplicates.py) rather than vanishing with the terminal
+-- output the moment a run finishes.
+-- ----------------------------------------------------------------------------
+
+create type duplicate_confidence_enum as enum ('likely', 'uncertain');
+create type duplicate_flag_status_enum as enum ('pending', 'approved', 'rejected');
+
+create table character_duplicate_flags (
+  id uuid primary key default gen_random_uuid(),
+  book_id uuid not null references books(id) on delete cascade,
+
+  character_ids uuid[] not null,        -- every character in the flagged group
+  canonical_id uuid not null,           -- which one the model suggested as the survivor
+
+  confidence duplicate_confidence_enum not null,
+  reasoning text not null,
+
+  status duplicate_flag_status_enum not null default 'pending',
+
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz
+);
+
+create index idx_duplicate_flags_book on character_duplicate_flags(book_id);
+create index idx_duplicate_flags_status on character_duplicate_flags(status);
+
 -- ============================================================================
 -- NOTE ON RE-PROCESSING A BOOK
 -- ============================================================================

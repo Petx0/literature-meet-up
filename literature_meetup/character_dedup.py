@@ -148,11 +148,14 @@ def apply_certain_merges(
     return merged_characters, events, unmerged_groups
 
 
-def dedupe_characters(client, characters: list[dict], events: list[dict]) -> tuple[list[dict], list[dict]]:
+def dedupe_characters(
+    client, characters: list[dict], events: list[dict]
+) -> tuple[list[dict], list[dict], list[dict]]:
     """Runs the full Addendum 7 stage: detect duplicate groups, then apply
-    only the certain-confidence merges. Prints any likely/uncertain groups
-    to console for manual review - a nicety the addendum suggests rather
-    than requires, so this signal isn't silently discarded.
+    only the certain-confidence merges. Returns the likely/uncertain groups
+    (rather than just printing and discarding them) so callers can persist
+    them for later review - see character_duplicate_flags in schema.sql and
+    scripts/review_duplicates.py.
     """
     duplicate_groups = detect_character_duplicates(client, characters, events)
     characters, events, unmerged_groups = apply_certain_merges(characters, events, duplicate_groups)
@@ -162,4 +165,4 @@ def dedupe_characters(client, characters: list[dict], events: list[dict]) -> tup
         for group in unmerged_groups:
             print(f"  [{group['confidence']}] {group['character_ids']} -> {group['canonical_id']}: {group['reasoning']}")
 
-    return characters, events
+    return characters, events, unmerged_groups

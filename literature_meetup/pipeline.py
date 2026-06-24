@@ -38,15 +38,19 @@ def process_book(
     independently of extraction. Defaults to {} if not supplied.
 
     Returns {"story_state": ..., "events": ..., "locations": ...,
-    "book_metadata": {"estimated_setting": ...}}. `story_state` is the
-    extraction-time character/location registry, with `characters` updated
-    in place to reflect any certain-confidence merges from character
-    dedup; `events` is the final event set, each pointing at `locations`
-    via `location_id` rather than holding inline location data;
-    `locations` is the finalized, deduped, geocoded location table for
-    this book; `book_metadata` carries the book-wide setting estimate
-    (recorded regardless of confidence, per Addendum 5, even though only
-    medium/high confidence ever affects which events survive cleanup).
+    "book_metadata": {"estimated_setting": ...}, "unmerged_duplicate_groups":
+    [...]}. `story_state` is the extraction-time character/location
+    registry, with `characters` updated in place to reflect any
+    certain-confidence merges from character dedup; `events` is the final
+    event set, each pointing at `locations` via `location_id` rather than
+    holding inline location data; `locations` is the finalized, deduped,
+    geocoded location table for this book; `book_metadata` carries the
+    book-wide setting estimate (recorded regardless of confidence, per
+    Addendum 5, even though only medium/high confidence ever affects which
+    events survive cleanup); `unmerged_duplicate_groups` is the likely/
+    uncertain character-duplicate groups dedupe_characters() didn't
+    auto-merge, persisted by db.save_book() for later review rather than
+    discarded (see scripts/review_duplicates.py).
     """
     metadata = metadata or {}
 
@@ -55,7 +59,9 @@ def process_book(
 
     estimated_setting = estimate_book_setting(client, metadata, chapters)
 
-    characters, events = dedupe_characters(client, extracted["story_state"]["characters"], events)
+    characters, events, unmerged_duplicate_groups = dedupe_characters(
+        client, extracted["story_state"]["characters"], events
+    )
     extracted["story_state"]["characters"] = characters
 
     events = filter_complete_events(events, estimated_setting=estimated_setting)
@@ -67,4 +73,5 @@ def process_book(
         "events": events,
         "locations": locations,
         "book_metadata": {"estimated_setting": estimated_setting},
+        "unmerged_duplicate_groups": unmerged_duplicate_groups,
     }

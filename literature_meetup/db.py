@@ -31,6 +31,9 @@ def save_book(conn, novel: dict, pipeline_result: dict) -> str:
             character_id_map = _insert_characters(cur, book_id, pipeline_result["story_state"]["characters"])
             location_id_map = _insert_locations(cur, book_id, pipeline_result["locations"])
             _insert_events(cur, book_id, pipeline_result["events"], character_id_map, location_id_map)
+            _insert_duplicate_flags(
+                cur, book_id, character_id_map, pipeline_result.get("unmerged_duplicate_groups", [])
+            )
         conn.commit()
         return book_id
     except Exception:
@@ -156,4 +159,22 @@ def _insert_events(cur, book_id: str, events: list, character_id_map: dict, loca
                 event.get("evidence_quote"),
                 event.get("confidence"),
             ),
+        )
+
+
+def _insert_duplicate_flags(cur, book_id: str, character_id_map: dict, unmerged_groups: list) -> None:
+    """Persists the likely/uncertain character-duplicate groups dedupe_characters()
+    didn't auto-merge, so they can be reviewed later (scripts/review_duplicates.py)
+    instead of only ever being printed to console and lost.
+    """
+    for group in unmerged_groups:
+        character_ids = [character_id_map[character_id] for character_id in group["character_ids"]]
+        canonical_id = character_id_map[group["canonical_id"]]
+        cur.execute(
+            """
+            insert into character_duplicate_flags (
+                book_id, character_ids, canonical_id, confidence, reasoning
+            ) values (%s, %s::uuid[], %s, %s, %s)
+            """,
+            (book_id, character_ids, canonical_id, group["confidence"], group["reasoning"]),
         )
