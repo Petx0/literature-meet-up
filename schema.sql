@@ -54,6 +54,14 @@ create table books (
   title text not null,
   author text,
   gutendex_metadata jsonb,                       -- raw Gutendex response, for reference/debugging
+  chapters_processed integer,                    -- how many chapters were fed into process_book() for
+                                                  -- this run; null for rows inserted before this column
+                                                  -- existed. Lets a reprocessing script tell "already
+                                                  -- ran on the full text" apart from "still truncated"
+                                                  -- without guessing from how many chapters' events
+                                                  -- survived cleanup (unreliable - cleanup legitimately
+                                                  -- drops chapters with no usable date, and how many
+                                                  -- varies a lot book to book).
 
   -- Addendum 5: book-level estimated setting
   estimated_year_range_start integer,

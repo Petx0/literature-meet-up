@@ -27,7 +27,13 @@ def save_book(conn, novel: dict, pipeline_result: dict) -> str:
 
     try:
         with conn.cursor() as cur:
-            book_id = _insert_book(cur, metadata, novel.get("raw_gutendex_metadata"), estimated_setting)
+            book_id = _insert_book(
+                cur,
+                metadata,
+                novel.get("raw_gutendex_metadata"),
+                estimated_setting,
+                pipeline_result.get("chapters_processed"),
+            )
             character_id_map = _insert_characters(cur, book_id, pipeline_result["story_state"]["characters"])
             location_id_map = _insert_locations(cur, book_id, pipeline_result["locations"])
             _insert_events(cur, book_id, pipeline_result["events"], character_id_map, location_id_map)
@@ -41,14 +47,16 @@ def save_book(conn, novel: dict, pipeline_result: dict) -> str:
         raise
 
 
-def _insert_book(cur, metadata: dict, raw_gutendex_metadata, estimated_setting: dict) -> str:
+def _insert_book(
+    cur, metadata: dict, raw_gutendex_metadata, estimated_setting: dict, chapters_processed: int | None
+) -> str:
     cur.execute(
         """
         insert into books (
-            gutenberg_id, title, author, gutendex_metadata,
+            gutenberg_id, title, author, gutendex_metadata, chapters_processed,
             estimated_year_range_start, estimated_year_range_end,
             estimated_setting_confidence, estimated_setting_basis, estimated_setting_method
-        ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         returning id
         """,
         (
@@ -56,6 +64,7 @@ def _insert_book(cur, metadata: dict, raw_gutendex_metadata, estimated_setting: 
             metadata.get("title"),
             metadata.get("author"),
             psycopg2.extras.Json(raw_gutendex_metadata) if raw_gutendex_metadata is not None else None,
+            chapters_processed,
             estimated_setting.get("year_range_start"),
             estimated_setting.get("year_range_end"),
             estimated_setting.get("confidence"),

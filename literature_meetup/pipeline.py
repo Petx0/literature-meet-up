@@ -39,18 +39,22 @@ def process_book(
 
     Returns {"story_state": ..., "events": ..., "locations": ...,
     "book_metadata": {"estimated_setting": ...}, "unmerged_duplicate_groups":
-    [...]}. `story_state` is the extraction-time character/location
-    registry, with `characters` updated in place to reflect any
-    certain-confidence merges from character dedup; `events` is the final
-    event set, each pointing at `locations` via `location_id` rather than
-    holding inline location data; `locations` is the finalized, deduped,
-    geocoded location table for this book; `book_metadata` carries the
-    book-wide setting estimate (recorded regardless of confidence, per
+    [...], "chapters_processed": int}. `story_state` is the extraction-time
+    character/location registry, with `characters` updated in place to
+    reflect any certain-confidence merges from character dedup; `events` is
+    the final event set, each pointing at `locations` via `location_id`
+    rather than holding inline location data; `locations` is the finalized,
+    deduped, geocoded location table for this book; `book_metadata` carries
+    the book-wide setting estimate (recorded regardless of confidence, per
     Addendum 5, even though only medium/high confidence ever affects which
     events survive cleanup); `unmerged_duplicate_groups` is the likely/
     uncertain character-duplicate groups dedupe_characters() didn't
     auto-merge, persisted by db.save_book() for later review rather than
-    discarded (see scripts/review_duplicates.py).
+    discarded (see scripts/review_duplicates.py); `chapters_processed` is
+    simply `len(chapters)` - the number of chapters actually fed into this
+    run, stored verbatim so later code can tell "already ran on the full
+    text" apart from "still truncated" without guessing from how many
+    chapters' events survived cleanup (unreliable - see schema.sql).
     """
     metadata = metadata or {}
 
@@ -74,4 +78,5 @@ def process_book(
         "locations": locations,
         "book_metadata": {"estimated_setting": estimated_setting},
         "unmerged_duplicate_groups": unmerged_duplicate_groups,
+        "chapters_processed": len(chapters),
     }

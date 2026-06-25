@@ -13,6 +13,16 @@ Safety: the old row is only deleted AFTER a new pipeline run succeeds, and
 the delete + the new insert happen in the same DB transaction (save_book's
 own commit covers both) - so a failed API call never destroys existing data.
 
+Idempotent across re-runs: a book whose existing row's chapters_processed
+already matches (or exceeds) the freshly-fetched full chapter count is
+skipped before any API call - otherwise a re-run (e.g. after hitting a
+billing limit partway through the corpus) would burn API cost re-doing books
+that were already fully reprocessed in an earlier run. chapters_processed is
+read straight off the books row (see schema.sql) rather than inferred from
+how many chapters' events survived cleanup, which is unreliable - cleanup
+legitimately drops chapters with no usable date, and by how much varies a
+lot book to book.
+
 Usage:
     python scripts/reprocess_full_books.py
 """
@@ -36,13 +46,13 @@ from literature_meetup import usage_tracker
 MAX_CHAPTERS = int(os.environ.get("MAX_CHAPTERS", "120"))
 
 
-def existing_books(conn) -> list[tuple[str, int, str]]:
+def existing_books(conn) -> list[tuple[str, int, str, int | None]]:
     with conn.cursor() as cur:
-        cur.execute("select id, gutenberg_id, title from books order by processed_at")
+        cur.execute("select id, gutenberg_id, title, chapters_processed from books order by processed_at")
         return cur.fetchall()
 
 
-def reprocess_one(old_book_id: str, gutenberg_id: int, old_title: str) -> dict:
+def reprocess_one(old_book_id: str, gutenberg_id: int, old_title: str, chapters_processed: int | None) -> dict:
     usage_tracker.reset()
     start = time.monotonic()
 
@@ -54,6 +64,10 @@ def reprocess_one(old_book_id: str, gutenberg_id: int, old_title: str) -> dict:
     if chapter_count > MAX_CHAPTERS:
         print(f"  Keeping existing truncated row - {chapter_count} chapters exceeds MAX_CHAPTERS={MAX_CHAPTERS}.")
         return {"title": old_title, "status": f"kept existing ({chapter_count} chapters)", "elapsed_seconds": None, "cost": None}
+
+    if chapters_processed is not None and chapters_processed >= chapter_count:
+        print(f"  Already fully reprocessed ({chapters_processed} of {chapter_count} chapters) - skipping.")
+        return {"title": old_title, "status": "already fully reprocessed", "elapsed_seconds": None, "cost": None}
 
     client = anthropic.Anthropic()
     result = process_book(client, chapters, metadata=novel["metadata"], book_id=str(gutenberg_id))
@@ -97,10 +111,10 @@ def main():
     print(f"Found {len(books)} existing book(s) to reprocess.\n")
 
     summary = []
-    for old_book_id, gutenberg_id, old_title in books:
+    for old_book_id, gutenberg_id, old_title, chapters_processed in books:
         print(f"=== {old_title} (gutenberg_id={gutenberg_id}) ===")
         try:
-            summary.append(reprocess_one(old_book_id, gutenberg_id, old_title))
+            summary.append(reprocess_one(old_book_id, gutenberg_id, old_title, chapters_processed))
         except Exception as exc:
             print(f"  ERROR: {exc!r} - existing row left untouched, skipping to next book.")
             summary.append({"title": old_title, "status": f"failed: {exc!r}", "elapsed_seconds": None, "cost": None})
