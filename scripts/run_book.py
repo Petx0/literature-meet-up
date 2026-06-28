@@ -16,7 +16,7 @@ with open(os.path.join(os.path.dirname(__file__), "..", ".env")) as f:
 import anthropic
 
 from literature_meetup import fetch_novel, get_connection, process_book, save_book
-from literature_meetup import usage_tracker
+from literature_meetup import model_config, usage_tracker
 
 # No per-book chapter cap in production - process every chapter Gutendex
 # returns. MAX_CHAPTERS is a separate guard: refuse to run a novel longer
@@ -46,7 +46,7 @@ def main():
         )
         return
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic() if model_config.LLM_BACKEND == "api" else None
     result = process_book(client, chapters, metadata=novel["metadata"], book_id=str(novel["metadata"]["gutenberg_id"]))
 
     conn = get_connection()
@@ -63,7 +63,13 @@ def main():
     conn.close()
 
     cost_summary = usage_tracker.summary()
-    print(f"API cost for this book: ${cost_summary['total_cost']:.4f}")
+    if model_config.LLM_BACKEND == "cli":
+        print(
+            f"Subscription usage (no per-token billing); "
+            f"equivalent API cost would have been ~${cost_summary['equivalent_api_cost']:.4f}"
+        )
+    else:
+        print(f"API cost for this book: ${cost_summary['total_cost']:.4f}")
     for model, bucket in cost_summary["by_model"].items():
         print(
             f"  {model}: {bucket['calls']} call(s), "

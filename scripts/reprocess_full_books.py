@@ -41,7 +41,7 @@ with open(os.path.join(os.path.dirname(__file__), "..", ".env")) as f:
 import anthropic
 
 from literature_meetup import fetch_novel_by_id, get_connection, process_book, save_book
-from literature_meetup import usage_tracker
+from literature_meetup import model_config, usage_tracker
 
 MAX_CHAPTERS = int(os.environ.get("MAX_CHAPTERS", "120"))
 
@@ -69,7 +69,7 @@ def reprocess_one(old_book_id: str, gutenberg_id: int, old_title: str, chapters_
         print(f"  Already fully reprocessed ({chapters_processed} of {chapter_count} chapters) - skipping.")
         return {"title": old_title, "status": "already fully reprocessed", "elapsed_seconds": None, "cost": None}
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic() if model_config.LLM_BACKEND == "api" else None
     result = process_book(client, chapters, metadata=novel["metadata"], book_id=str(gutenberg_id))
 
     conn = get_connection()
@@ -91,7 +91,13 @@ def reprocess_one(old_book_id: str, gutenberg_id: int, old_title: str, chapters_
     elapsed = time.monotonic() - start
     cost_summary = usage_tracker.summary()
     print(f"  Replaced book_id {old_book_id} -> {new_book_id} | characters: {characters} | locations: {locations} | events: {events}")
-    print(f"  Time: {elapsed:.0f}s | Cost: ${cost_summary['total_cost']:.4f}")
+    if model_config.LLM_BACKEND == "cli":
+        print(
+            f"  Time: {elapsed:.0f}s | Subscription usage (no per-token billing); "
+            f"equivalent API cost ~${cost_summary['equivalent_api_cost']:.4f}"
+        )
+    else:
+        print(f"  Time: {elapsed:.0f}s | Cost: ${cost_summary['total_cost']:.4f}")
 
     return {
         "title": novel["metadata"]["title"],

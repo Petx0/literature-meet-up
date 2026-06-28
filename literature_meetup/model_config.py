@@ -25,6 +25,27 @@ are also the recommended setting for each stage.
 |                                  |                              |                     | bounded regardless of book length.                        |
 | Character duplication detection  | CHARACTER_DEDUP_MODEL       | claude-opus-4-8     | Narrative judgment about behavior/continuity, not string |
 |                                  |                              |                     | matching (Addendum 7). Also once per book.                |
+
+LLM_BACKEND selects how every stage above actually places its call, not
+which model it asks for:
+  - "api" (default): the Anthropic Python SDK, billed per-token against
+    ANTHROPIC_API_KEY. Supports forced tool-use and cache_control.
+  - "cli": literature_meetup/cli_backend.py via claude-agent-sdk, which
+    spawns the locally-installed, subscription-authenticated `claude` CLI
+    (run `claude login` once) - no per-token billing, but requires the CLI
+    installed and logged in, and loses forced tool-use (the schema is
+    turned into a "respond with only this JSON" instruction instead - see
+    llm_client.py). One switch controls all four stages above.
+
+CLI_SESSION_BUDGET_USD (cli_backend.py): optional proactive ceiling on
+cumulative equivalent-API-cost for the "cli" backend across an entire
+process run (not reset per book, unlike usage_tracker). Subscription usage
+windows (Claude Pro/Max) can't be reliably outrun by pacing calls slightly
+slower, so once a run gets rate-limited, the fix is to stop proactively
+*before* the call that would hit it, not retry harder. Unset by default
+(no cap enforced) - there's no reliable a-priori number for the real quota,
+so set this empirically from a prior rate-limited run's reported
+`equivalent_api_cost`, a bit lower, for the next run.
 """
 
 import os
@@ -38,3 +59,5 @@ EXTRACTION_MODEL = os.environ.get("EXTRACTION_MODEL", DEFAULT_EXTRACTION_MODEL)
 RECONSTRUCTION_MODEL = os.environ.get("RECONSTRUCTION_MODEL", DEFAULT_RECONSTRUCTION_MODEL)
 SETTING_ESTIMATION_MODEL = os.environ.get("SETTING_ESTIMATION_MODEL", DEFAULT_SETTING_ESTIMATION_MODEL)
 CHARACTER_DEDUP_MODEL = os.environ.get("CHARACTER_DEDUP_MODEL", DEFAULT_CHARACTER_DEDUP_MODEL)
+
+LLM_BACKEND = os.environ.get("LLM_BACKEND", "api")

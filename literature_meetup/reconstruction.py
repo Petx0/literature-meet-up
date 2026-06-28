@@ -1,9 +1,9 @@
 import json
 
+from literature_meetup import llm_client
 from literature_meetup.model_config import RECONSTRUCTION_MODEL as MODEL
 from literature_meetup.reconstruction_prompt import RECONSTRUCTION_SYSTEM_PROMPT
 from literature_meetup.reconstruction_schema import ASSIGN_CHRONOLOGICAL_ORDER_TOOL
-from literature_meetup.usage_tracker import record as record_usage
 
 DATE_FIELDS = ("year", "month", "day", "year_range_start", "year_range_end")
 
@@ -38,18 +38,15 @@ def reconstruct_chronology(client, events: list[dict]) -> list[dict]:
         for event in dated_events
     ]
 
-    response = client.messages.create(
-        model=MODEL,
+    result = llm_client.call_tool(
+        client,
+        MODEL,
+        RECONSTRUCTION_SYSTEM_PROMPT,
+        ASSIGN_CHRONOLOGICAL_ORDER_TOOL,
+        json.dumps(payload, separators=(",", ":")),
         max_tokens=8000,
-        system=[{"type": "text", "text": RECONSTRUCTION_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
-        tools=[ASSIGN_CHRONOLOGICAL_ORDER_TOOL],
-        tool_choice={"type": "tool", "name": "assign_chronological_order"},
-        messages=[{"role": "user", "content": json.dumps(payload, separators=(",", ":"))}],
     )
-
-    record_usage(MODEL, response.usage)
-    tool_use = next(block for block in response.content if block.type == "tool_use")
-    assignments_by_id = {entry["event_id"]: entry for entry in tool_use.input["ordered_events"]}
+    assignments_by_id = {entry["event_id"]: entry for entry in result["ordered_events"]}
 
     for event in dated_events:
         assignment = assignments_by_id.get(event["event_id"])

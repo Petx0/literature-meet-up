@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 
+from literature_meetup import llm_client
 from literature_meetup.model_config import SETTING_ESTIMATION_MODEL as MODEL
 from literature_meetup.setting_estimation_prompt import SETTING_ESTIMATION_SYSTEM_PROMPT
 from literature_meetup.setting_estimation_schema import ESTIMATE_BOOK_SETTING_TOOL
-from literature_meetup.usage_tracker import record as record_usage
 
 SAMPLE_CHAPTER_COUNT = 2
 
@@ -36,15 +36,7 @@ def estimate_book_setting(client, metadata: dict, chapters: list[dict]) -> dict:
         f"## Text sample (opening chapters)\n{text_sample}"
     )
 
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=2000,
-        system=[{"type": "text", "text": SETTING_ESTIMATION_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
-        tools=[ESTIMATE_BOOK_SETTING_TOOL],
-        tool_choice={"type": "tool", "name": "estimate_book_setting"},
-        messages=[{"role": "user", "content": user_content}],
+    result = llm_client.call_tool(
+        client, MODEL, SETTING_ESTIMATION_SYSTEM_PROMPT, ESTIMATE_BOOK_SETTING_TOOL, user_content, max_tokens=2000
     )
-
-    record_usage(MODEL, response.usage)
-    tool_use = next(block for block in response.content if block.type == "tool_use")
-    return json.loads(json.dumps(tool_use.input))
+    return json.loads(json.dumps(result))

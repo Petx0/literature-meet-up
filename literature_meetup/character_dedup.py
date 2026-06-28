@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 
+from literature_meetup import llm_client
 from literature_meetup.character_dedup_prompt import CHARACTER_DEDUP_SYSTEM_PROMPT
 from literature_meetup.character_dedup_schema import FLAG_CHARACTER_DUPLICATES_TOOL
 from literature_meetup.model_config import CHARACTER_DEDUP_MODEL as MODEL
-from literature_meetup.usage_tracker import record as record_usage
 
 
 MAX_EVIDENCE_EVENTS_PER_CHARACTER = 10
@@ -62,18 +62,15 @@ def detect_character_duplicates(client, characters: list[dict], events: list[dic
 
     context = _build_character_context(characters, events)
 
-    response = client.messages.create(
-        model=MODEL,
+    result = llm_client.call_tool(
+        client,
+        MODEL,
+        CHARACTER_DEDUP_SYSTEM_PROMPT,
+        FLAG_CHARACTER_DUPLICATES_TOOL,
+        json.dumps(context, separators=(",", ":")),
         max_tokens=4000,
-        system=[{"type": "text", "text": CHARACTER_DEDUP_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
-        tools=[FLAG_CHARACTER_DUPLICATES_TOOL],
-        tool_choice={"type": "tool", "name": "flag_character_duplicates"},
-        messages=[{"role": "user", "content": json.dumps(context, separators=(",", ":"))}],
     )
-
-    record_usage(MODEL, response.usage)
-    tool_use = next(block for block in response.content if block.type == "tool_use")
-    return tool_use.input["duplicate_groups"]
+    return result["duplicate_groups"]
 
 
 def _build_redirect_map(certain_groups: list[dict]) -> dict[str, str]:

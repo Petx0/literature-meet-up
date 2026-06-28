@@ -18,7 +18,8 @@ with open(os.path.join(os.path.dirname(__file__), "..", ".env")) as f:
 import anthropic
 
 from literature_meetup import fetch_novel_by_id, get_connection, process_book, save_book
-from literature_meetup import usage_tracker
+from literature_meetup import model_config, usage_tracker
+from literature_meetup.cli_backend import CliStopBatchError
 
 # No per-book chapter cap in production - process every chapter Gutendex returns.
 # MAX_CHAPTERS is a separate, unrelated guard: skip a novel outright (no Claude
@@ -41,9 +42,18 @@ CORPUS = [
     (86, "A Connecticut Yankee in King Arthur's Court"),
     (3526, "Five Weeks in a Balloon"),
     (2166, "King Solomon's Mines"),
-    (2226, "Kim"),
     (2641, "A Room with a View"),
     (829, "Gulliver's Travels"),
+    (2554, "Crime and Punishment"),
+    (2610, "Notre-Dame de Paris (The Hunchback of Notre Dame)"),
+    (2145, "Ben-Hur"),
+    (1565, "The Last Days of Pompeii"),
+    (2853, "Quo Vadis"),
+    (145, "Middlemarch"),
+    (143, "The Mayor of Casterbridge"),
+    (541, "The Age of Innocence"),
+    (2600, "War and Peace"),
+    (1399, "Anna Karenina"),
 ]
 
 
@@ -63,7 +73,7 @@ def process_one(novel: dict, gutenberg_id: int) -> dict:
         f"({len(chapters)} chapters)"
     )
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic() if model_config.LLM_BACKEND == "api" else None
     result = process_book(client, chapters, metadata=novel["metadata"], book_id=str(gutenberg_id))
 
     conn = get_connection()
@@ -82,7 +92,13 @@ def process_one(novel: dict, gutenberg_id: int) -> dict:
     elapsed = time.monotonic() - start
     cost_summary = usage_tracker.summary()
     print(f"  Saved book_id: {book_id} | characters: {characters} | locations: {locations} | events: {events}")
-    print(f"  Time: {elapsed:.0f}s | Cost: ${cost_summary['total_cost']:.4f}")
+    if model_config.LLM_BACKEND == "cli":
+        print(
+            f"  Time: {elapsed:.0f}s | Subscription usage (no per-token billing); "
+            f"equivalent API cost ~${cost_summary['equivalent_api_cost']:.4f}"
+        )
+    else:
+        print(f"  Time: {elapsed:.0f}s | Cost: ${cost_summary['total_cost']:.4f}")
 
     return {
         "title": novel["metadata"]["title"],
@@ -120,6 +136,10 @@ def main():
 
         try:
             summary.append(process_one(novel, gutenberg_id))
+        except CliStopBatchError as exc:
+            print(f"  STOPPING BATCH: {exc} Re-run later to resume.")
+            summary.append({"title": title, "status": f"failed: {exc}", "elapsed_seconds": None, "cost": None})
+            break
         except Exception as exc:
             print(f"  ERROR: {exc!r} - skipping to next book.")
             summary.append({"title": title, "status": f"failed: {exc!r}", "elapsed_seconds": None, "cost": None})

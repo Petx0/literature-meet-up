@@ -50,6 +50,17 @@ chapters per book (`CHAPTER_CAP`) — this is a deliberate, still-active test
 constraint, not a bug, while the pipeline is being validated against more
 books.
 
+When running with `LLM_BACKEND=cli` (subscription billing via the local
+`claude` CLI instead of per-token API billing — see `model_config.py`),
+subscription usage windows can't be reliably outrun by retrying or pacing
+calls slightly slower; once a run gets rate-limited mid-batch, the fix is to
+stop proactively before the call that would hit it. After any run that gets
+rate-limited, note the `equivalent_api_cost` figure printed in that run's
+summary, then set `CLI_SESSION_BUDGET_USD` in `.env` to a bit below that
+figure before the next `run_test_corpus.py` run — it stops the batch
+cleanly once the process-lifetime equivalent cost reaches the cap, instead
+of burning through the rest of the corpus against the same wall.
+
 ## Architecture
 
 ### The pipeline is a single in-memory function, with one DB write at the end
