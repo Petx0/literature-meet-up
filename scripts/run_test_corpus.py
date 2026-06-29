@@ -46,14 +46,15 @@ CORPUS = [
     (829, "Gulliver's Travels"),
     (2554, "Crime and Punishment"),
     (2610, "Notre-Dame de Paris (The Hunchback of Notre Dame)"),
-    (2145, "Ben-Hur"),
-    (1565, "The Last Days of Pompeii"),
-    (2853, "Quo Vadis"),
     (145, "Middlemarch"),
     (143, "The Mayor of Casterbridge"),
     (541, "The Age of Innocence"),
     (2600, "War and Peace"),
     (1399, "Anna Karenina"),
+    (74, "The Adventures of Tom Sawyer"),
+    (120, "Treasure Island"),
+    (244, "A Study in Scarlet"),
+    (4217, "A Portrait of the Artist as a Young Man"),
 ]
 
 

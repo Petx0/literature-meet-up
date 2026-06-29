@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from literature_meetup import model_config
 from literature_meetup.analyze_pipeline import analyze_book
 from literature_meetup.character_dedup import dedupe_characters
 from literature_meetup.cleanup import filter_complete_events
@@ -7,6 +8,27 @@ from literature_meetup.dedup_locations import dedupe_locations
 from literature_meetup.geocode_backfill import geocode_backfill
 from literature_meetup.reconstruction import reconstruct_chronology
 from literature_meetup.setting_estimation import estimate_book_setting
+from literature_meetup.wikidata_characters import discover_target_characters
+
+
+def _sample_chapters(chapters: list[dict], chapter_sample_pct: float) -> list[dict]:
+    """Cost/quality-tradeoff approximation, not a correctness feature: process
+    only the first chapter_sample_pct% of the book (e.g. 50 on an 8-chapter
+    book processes the first 4), leaving the rest of the book's events
+    undiscovered entirely - a coarser, blunter lever than target_characters or
+    include_evidence_quote above, since it drops real chapters rather than
+    just trimming what's reported about chapters that are still read. Applied
+    here, before any stage runs, so chapters_processed downstream (schema.sql)
+    correctly reflects what was actually processed, not the book's true
+    chapter count - reprocess_full_books.py can later upgrade a sampled run to
+    the full book exactly like the old CHAPTER_CAP cases.
+    """
+    if not 0 < chapter_sample_pct <= 100:
+        raise ValueError(f"chapter_sample_pct must be in (0, 100], got {chapter_sample_pct}")
+    if chapter_sample_pct == 100:
+        return chapters
+    sample_size = max(1, round(len(chapters) * chapter_sample_pct / 100))
+    return chapters[:sample_size]
 
 
 def process_book(
@@ -14,6 +36,9 @@ def process_book(
     chapters: list[dict],
     metadata: dict | None = None,
     book_id: str | None = None,
+    target_characters: list[str] | None = None,
+    include_evidence_quote: bool | None = None,
+    chapter_sample_pct: float | None = None,
 ) -> dict:
     """Runs the full in-memory pipeline for one book, per Addenda 1-7:
     chapter-by-chapter extraction, one whole-book chronological
@@ -55,10 +80,41 @@ def process_book(
     run, stored verbatim so later code can tell "already ran on the full
     text" apart from "still truncated" without guessing from how many
     chapters' events survived cleanup (unreliable - see schema.sql).
+    target_characters, include_evidence_quote, and chapter_sample_pct are cost levers
+    on the extraction stage (see analyze_pipeline.analyze_book and _sample_chapters
+    above). include_evidence_quote and chapter_sample_pct default to None here, which
+    means "use the .env-configured default" (model_config.INCLUDE_EVIDENCE_QUOTE /
+    CHAPTER_SAMPLE_PCT) - pass an explicit value to override just this call. When
+    target_characters isn't passed and model_config.TARGET_CHARACTERS_AUTO_DISCOVER is
+    enabled, this looks `metadata`'s title/author up on Wikidata (see
+    wikidata_characters.discover_target_characters) and uses whatever it finds,
+    falling back to unrestricted extraction (not an error) if Wikidata has no match or
+    no characters for this book - see model_config.py for the full rationale and the
+    measured cost-vs-list-size tradeoff behind TARGET_CHARACTERS_TOP_N.
     """
     metadata = metadata or {}
+    if include_evidence_quote is None:
+        include_evidence_quote = model_config.INCLUDE_EVIDENCE_QUOTE
+    if chapter_sample_pct is None:
+        chapter_sample_pct = model_config.CHAPTER_SAMPLE_PCT
+    if target_characters is None and model_config.TARGET_CHARACTERS_AUTO_DISCOVER:
+        target_characters = discover_target_characters(
+            metadata.get("title"), metadata.get("author"), top_n=model_config.TARGET_CHARACTERS_TOP_N
+        )
+        if target_characters:
+            print(f"  Auto-discovered target_characters from Wikidata: {target_characters}")
+        else:
+            print("  TARGET_CHARACTERS_AUTO_DISCOVER: no Wikidata match/characters found - extracting unrestricted.")
 
-    extracted = analyze_book(client, chapters, book_id=book_id)
+    chapters = _sample_chapters(chapters, chapter_sample_pct)
+
+    extracted = analyze_book(
+        client,
+        chapters,
+        book_id=book_id,
+        target_characters=target_characters,
+        include_evidence_quote=include_evidence_quote,
+    )
     events = reconstruct_chronology(client, extracted["events"])
 
     estimated_setting = estimate_book_setting(client, metadata, chapters)

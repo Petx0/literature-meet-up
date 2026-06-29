@@ -38,8 +38,11 @@ def _build_character_context(characters: list[dict], events: list[dict]) -> list
                 "id": character["id"],
                 "canonical_name": character["canonical_name"],
                 "aliases": character.get("aliases", []),
+                # evidence_quote is omitted from events when extraction ran with
+                # include_evidence_quote=False (the default - see analyze_pipeline.py)
+                # rather than KeyError-ing on a field that was deliberately never asked for.
                 "events": [
-                    {"chapter": event["chapter"], "evidence_quote": event["evidence_quote"]}
+                    {"chapter": event["chapter"], **({"evidence_quote": event["evidence_quote"]} if "evidence_quote" in event else {})}
                     for event in character_events
                 ],
             }

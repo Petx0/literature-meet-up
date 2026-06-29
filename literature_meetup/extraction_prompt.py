@@ -1,4 +1,20 @@
-SYSTEM_PROMPT = """# Character Location & Time Extraction — System Prompt
+_EVIDENCE_SECTION = """## Evidence
+
+For each event, include a brief `evidence_quote` field. This must be a short paraphrase in your own words of the textual basis for the event — never a verbatim quotation from the source text, regardless of length.
+
+"""
+
+
+def build_system_prompt(include_evidence_quote: bool = False) -> str:
+    """include_evidence_quote is the prompt-side half of the experimental,
+    opt-in evidence_quote cost lever - see extraction_schema.py's
+    _event_item_schema for the schema-side half. Both must be passed the
+    same flag (chapter_analyzer.py does this) since the schema is what
+    forced tool-use actually enforces; this just keeps the prompt from
+    instructing the model to fill in a field the schema no longer has.
+    """
+    evidence_section = _EVIDENCE_SECTION if include_evidence_quote else ""
+    return f"""# Character Location & Time Extraction — System Prompt
 
 ## Task
 
@@ -64,11 +80,7 @@ Do not create a new event for every sentence a character appears in if neither t
 - `"explicit"` — the text directly states or unambiguously shows the character present (action, dialogue, direct narration).
 - `"inferred"` — presence is implied but not directly stated (e.g. a character is assumed present in a scene because they were last seen entering the room and the narration doesn't explicitly mention them leaving).
 
-## Evidence
-
-For each event, include a brief `evidence_quote` field. This must be a short paraphrase in your own words of the textual basis for the event — never a verbatim quotation from the source text, regardless of length.
-
-## Output
+{evidence_section}## Output
 
 Call `record_chapter_events` exactly once per chapter with:
 - `new_characters` — any characters introduced this chapter, not present in `story_state`.
@@ -77,3 +89,6 @@ Call `record_chapter_events` exactly once per chapter with:
 
 Do not output anything outside the tool call.
 """
+
+
+SYSTEM_PROMPT = build_system_prompt()

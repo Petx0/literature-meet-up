@@ -37,6 +37,11 @@ Zenda (#95), Kim (#2226).
 | 20 | Middlemarch | George Eliot | 145 | Real Midlands England region, large ensemble cast, real 1830s political backdrop (Reform Act). |
 | 21 | The Mayor of Casterbridge | Thomas Hardy | 143 | Dorset/Wessex English geography, smaller cast — clean baseline test. |
 | 22 | The Age of Innocence | Edith Wharton | 541 | 1870s New York high society — first Gilded Age American setting in the corpus. |
+| 23 | The Adventures of Tom Sawyer | Mark Twain | 74 | Selected for popularity + Wikidata character coverage (third batch, see below), not location-richness — thinner geography than the rest of this list. |
+| 24 | Treasure Island | Robert Louis Stevenson | 120 | Re-added under the third batch's different criteria below despite being explicitly dropped from the original longlist (line 10) for thin location variety — included here for its Wikidata-sourced main-cast coverage and popularity, not as a location test. |
+| 25 | A Study in Scarlet | Arthur Conan Doyle | 244 | London-centric detective fiction; thinner geography than the rest of this list — selected for popularity + Wikidata coverage, not location-richness. |
+| 26 | Ulysses | James Joyce | 4300 | Dublin, single-day timeframe — selected for popularity + Wikidata coverage; a real stress test for the book_estimated/day-precision machinery given its compressed timeframe. |
+| 27 | A Portrait of the Artist as a Young Man | James Joyce | 4217 | Ireland, multi-year Bildungsroman — selected for popularity + Wikidata coverage. |
 
 ---
 
@@ -72,6 +77,26 @@ War and Peace and Anna Karenina are ordered last because, like Les Misérables,
 their Gutenberg editions split into hundreds of short chapters and will likely
 be auto-skipped by the `MAX_CHAPTERS=120` guard in `run_test_corpus.py` — no
 API cost incurred, consistent with existing Les Misérables handling.
+
+## Third batch (added 2026-06-29)
+
+Different selection criteria from the rest of this file: chosen for Gutenberg
+popularity (download count) and confirmed Wikidata `P674` main-character
+coverage - to exercise `TARGET_CHARACTERS_AUTO_DISCOVER` (see
+`literature_meetup/model_config.py`) on real, non-hand-picked books - not for
+geographic richness like batches one and two. Also filtered to exclude
+fantasy/sci-fi and supernatural/horror genres, and confirmed each is
+originally English-language via Wikidata's `P407` field rather than a
+translation.
+
+23. **#74** — The Adventures of Tom Sawyer — most-downloaded match found; thin
+    Wikidata cast (4 names) so auto-discovery has little to trim
+24. **#120** — Treasure Island — see note on row 24 above re: the original
+    location-richness drop
+25. **#244** — A Study in Scarlet — thin Wikidata cast (6 names), same caveat as #74
+26. **#4300** — Ulysses — single-day timeframe, good contrast to this corpus's
+    usual multi-year stories
+27. **#4217** — A Portrait of the Artist as a Young Man — multi-year Bildungsroman
 
 ## Cross-book meetup potential
 

@@ -46,6 +46,40 @@ slower, so once a run gets rate-limited, the fix is to stop proactively
 (no cap enforced) - there's no reliable a-priori number for the real quota,
 so set this empirically from a prior rate-limited run's reported
 `equivalent_api_cost`, a bit lower, for the next run.
+
+The remaining env vars below are process_book's (pipeline.py) cost levers -
+centralized here rather than left as Python-only kwargs, so every script
+(run_book.py, run_test_corpus.py, reprocess_full_books.py) picks up the same
+.env-configured behavior without each one threading its own CLI flags:
+
+INCLUDE_EVIDENCE_QUOTE (default "false"): whether extraction asks the model
+for a per-event evidence_quote. Off by default - measured ~20% output-token
+reduction with no accuracy cost (see chapter_analyzer.py).
+
+TARGET_CHARACTERS_AUTO_DISCOVER (default "false"): when "true",
+process_book looks up `metadata`'s title/author on Wikidata (see
+literature_meetup/wikidata_characters.py) and uses the result as
+target_characters whenever a caller doesn't pass one explicitly - cutting
+output tokens on minor characters (measured ~25-32% on a tight, well-suited
+list, less on a large untrimmed one - see TARGET_CHARACTERS_TOP_N). Off by
+default since it adds a network dependency (Wikidata) to every book run and
+its ranking has known, accepted imperfections (real-world-fame proxy, not a
+true narrative-importance measure - see
+wikidata_characters.fetch_main_characters_ranked's docstring). Silently
+falls back to unrestricted extraction (not an error) when Wikidata has no
+match or no characters for a book.
+
+TARGET_CHARACTERS_TOP_N (default "8"): how many ranked characters
+TARGET_CHARACTERS_AUTO_DISCOVER keeps per book. Confirmed live that a large,
+untrimmed P674 list dilutes the cost saving on a long book sampled only
+partially (8.6% reduction with 33 names vs 24.8% with 3, on the same
+chapters) - keep this small relative to the book's real main cast size.
+
+CHAPTER_SAMPLE_PCT (default "100", i.e. no sampling): process only the
+first N% of a book's chapters - see pipeline._sample_chapters. A real
+quality tradeoff (events from the unprocessed remainder are never
+discovered at all), not a free lever like the two above, so it defaults to
+full-book processing; only lower this deliberately.
 """
 
 import os
@@ -55,9 +89,19 @@ DEFAULT_RECONSTRUCTION_MODEL = "claude-haiku-4-5"
 DEFAULT_SETTING_ESTIMATION_MODEL = "claude-opus-4-8"
 DEFAULT_CHARACTER_DEDUP_MODEL = "claude-opus-4-8"
 
+
+def _env_bool(name: str, default: str) -> bool:
+    return os.environ.get(name, default).strip().lower() in ("1", "true", "yes")
+
+
 EXTRACTION_MODEL = os.environ.get("EXTRACTION_MODEL", DEFAULT_EXTRACTION_MODEL)
 RECONSTRUCTION_MODEL = os.environ.get("RECONSTRUCTION_MODEL", DEFAULT_RECONSTRUCTION_MODEL)
 SETTING_ESTIMATION_MODEL = os.environ.get("SETTING_ESTIMATION_MODEL", DEFAULT_SETTING_ESTIMATION_MODEL)
 CHARACTER_DEDUP_MODEL = os.environ.get("CHARACTER_DEDUP_MODEL", DEFAULT_CHARACTER_DEDUP_MODEL)
 
 LLM_BACKEND = os.environ.get("LLM_BACKEND", "api")
+
+INCLUDE_EVIDENCE_QUOTE = _env_bool("INCLUDE_EVIDENCE_QUOTE", "false")
+TARGET_CHARACTERS_AUTO_DISCOVER = _env_bool("TARGET_CHARACTERS_AUTO_DISCOVER", "false")
+TARGET_CHARACTERS_TOP_N = int(os.environ.get("TARGET_CHARACTERS_TOP_N", "8"))
+CHAPTER_SAMPLE_PCT = float(os.environ.get("CHAPTER_SAMPLE_PCT", "100"))

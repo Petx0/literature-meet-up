@@ -201,7 +201,10 @@ create table events (
 
   temporal_relation temporal_relation_enum not null,
 
-  evidence_quote text not null,                         -- paraphrase, never verbatim (copyright)
+  evidence_quote text,                                  -- paraphrase, never verbatim (copyright);
+                                                          -- null when extraction ran with
+                                                          -- include_evidence_quote=False (the
+                                                          -- default - see model_config.py)
   confidence presence_confidence_enum not null,         -- presence-confidence, distinct from time_source
 
   created_at timestamptz not null default now()
