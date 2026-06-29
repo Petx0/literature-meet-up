@@ -16,6 +16,7 @@ from literature_meetup.encounter_queries import (
     LOCATION_GRANULARITIES,
     TIME_GRANULARITIES,
     ensure_views,
+    list_countries,
     random_encounter,
 )
 
@@ -42,19 +43,34 @@ def on_startup() -> None:
         conn.close()
 
 
+@app.get("/api/countries")
+def api_countries():
+    conn = get_connection()
+    try:
+        countries = list_countries(conn)
+    finally:
+        conn.close()
+    return {"countries": countries}
+
+
 @app.get("/api/encounter")
 def api_encounter(
     time: str = Query("year"),
     location: str = Query("city"),
+    country: str | None = Query(None),
 ):
     if time not in TIME_GRANULARITIES:
         raise HTTPException(400, f"Invalid time granularity: {time!r}. Must be one of {TIME_GRANULARITIES}.")
     if location not in LOCATION_GRANULARITIES:
         raise HTTPException(400, f"Invalid location granularity: {location!r}. Must be one of {LOCATION_GRANULARITIES}.")
 
+    normalized_country = country.strip().lower() if country else None
+
     conn = get_connection()
     try:
-        encounter = random_encounter(conn, time, location)
+        if normalized_country and normalized_country not in list_countries(conn):
+            raise HTTPException(400, f"Invalid country: {country!r}.")
+        encounter = random_encounter(conn, time, location, normalized_country)
     finally:
         conn.close()
 

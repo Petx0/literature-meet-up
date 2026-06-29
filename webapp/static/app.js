@@ -1,5 +1,26 @@
 const findBtn = document.getElementById("find-btn");
 const resultDiv = document.getElementById("result");
+const countrySelect = document.getElementById("country-select");
+
+function capitalize(text) {
+  return text.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+async function loadCountries() {
+  try {
+    const response = await fetch("/api/countries");
+    if (!response.ok) return;
+    const data = await response.json();
+    for (const country of data.countries) {
+      const option = document.createElement("option");
+      option.value = country;
+      option.textContent = capitalize(country);
+      countrySelect.appendChild(option);
+    }
+  } catch (err) {
+    // Leave the dropdown at "Any country" if this fails.
+  }
+}
 
 function escapeHtml(text) {
   const div = document.createElement("div");
@@ -35,11 +56,13 @@ function renderEncounter(encounter) {
 async function findEncounter() {
   const time = document.getElementById("time-select").value;
   const location = document.getElementById("location-select").value;
+  const country = countrySelect.value;
 
   resultDiv.innerHTML = "<p class=\"status\">Searching…</p>";
 
   try {
-    const response = await fetch(`/api/encounter?time=${time}&location=${location}`);
+    const countryParam = country ? `&country=${encodeURIComponent(country)}` : "";
+    const response = await fetch(`/api/encounter?time=${time}&location=${location}${countryParam}`);
     if (!response.ok) {
       resultDiv.innerHTML = "<p class=\"status error\">Something went wrong. Please try again.</p>";
       return;
@@ -56,3 +79,4 @@ async function findEncounter() {
 }
 
 findBtn.addEventListener("click", findEncounter);
+loadCountries();

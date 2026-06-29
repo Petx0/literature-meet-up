@@ -179,12 +179,26 @@ def _location_condition(granularity: str) -> str:
     return " and ".join(parts)
 
 
-def random_encounter(conn, time_granularity: str, location_granularity: str) -> dict | None:
+def list_countries(conn) -> list[str]:
+    """Distinct countries that appear on at least one event eligible for
+    matching (joins the same event_match_points view random_encounter() uses,
+    so the dropdown this feeds never offers a country with zero results)."""
+    with conn.cursor() as cur:
+        cur.execute("select distinct country from event_match_points where country is not null order by country")
+        return [row[0] for row in cur.fetchall()]
+
+
+def random_encounter(conn, time_granularity: str, location_granularity: str, country: str | None = None) -> dict | None:
     """Picks one random matching character-encounter for the given
     granularities, or None if no pair satisfies them. Raises ValueError for
     an unrecognized granularity (callers should validate against
     TIME_GRANULARITIES/LOCATION_GRANULARITIES before calling, e.g. to turn
     that into a clean 400 at an API boundary).
+
+    `country` (already lowercased/trimmed by the caller) restricts both sides
+    of the encounter to that one country, independent of - and combinable
+    with - location_granularity, which only controls how strictly the two
+    sides' locations must match *each other*.
 
     Event-pairs are grouped by (character pair, displayed location, displayed
     time) before sampling - a character with many qualifying events would
@@ -194,9 +208,16 @@ def random_encounter(conn, time_granularity: str, location_granularity: str) -> 
     """
     time_condition = _time_condition(time_granularity)
     location_condition = _location_condition(location_granularity)
+    params: dict = {}
+    if country is not None:
+        location_condition += " and p1.country = %(country)s and p2.country = %(country)s"
+        params["country"] = country
 
     with conn.cursor() as cur:
-        cur.execute(COUNT_QUERY_TEMPLATE.format(time_condition=time_condition, location_condition=location_condition))
+        cur.execute(
+            COUNT_QUERY_TEMPLATE.format(time_condition=time_condition, location_condition=location_condition),
+            params,
+        )
         candidate_count = cur.fetchone()[0]
 
     if candidate_count > MAX_CANDIDATE_POOL:
@@ -210,7 +231,7 @@ def random_encounter(conn, time_granularity: str, location_granularity: str) -> 
         sample_condition=sample_condition,
     )
     with conn.cursor() as cur:
-        cur.execute(sql)
+        cur.execute(sql, params)
         row = cur.fetchone()
         if row is None:
             return None
