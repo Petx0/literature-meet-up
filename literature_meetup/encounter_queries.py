@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from literature_meetup.location_normalization import CONTINENT_NAMES
+
 TIME_GRANULARITIES = ("none", "century", "decade", "year", "month", "day")
 LOCATION_LEVELS = ("country", "region", "city", "neighborhood")
 LOCATION_GRANULARITIES = ("none",) + LOCATION_LEVELS
@@ -211,7 +213,7 @@ def list_countries(conn) -> list[str]:
             order by p1.country
             """
         )
-        return [row[0] for row in cur.fetchall()]
+        return [row[0] for row in cur.fetchall() if row[0] not in CONTINENT_NAMES]
 
 
 def random_encounter(conn, time_granularity: str, location_granularity: str, country: str | None = None) -> dict | None:

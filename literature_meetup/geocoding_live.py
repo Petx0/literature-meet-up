@@ -49,9 +49,29 @@ def _throttled_get(params: dict) -> list[dict]:
     return response.json()
 
 
+def _dedupe_same_place(results: list[dict]) -> list[dict]:
+    """Nominatim can return one real place as several separate OSM boundary
+    records (e.g. Paris as both a 'city' and a 'suburb', with identical
+    importance) - these aren't genuinely ambiguous candidates, just multiple
+    representations of the same place, and were making the importance-margin
+    check below wrongly reject unambiguous, well-known places. Collapses by
+    display_name, keeping each name's first (most relevant, per Nominatim's
+    own ordering) occurrence."""
+    seen = set()
+    deduped = []
+    for result in results:
+        name = result.get("display_name")
+        if name in seen:
+            continue
+        seen.add(name)
+        deduped.append(result)
+    return deduped
+
+
 def _accept_result(results: list[dict], level: str) -> dict | None:
     if not results:
         return None
+    results = _dedupe_same_place(results)
     if len(results) > 1:
         top_importance = results[0].get("importance", 0.0)
         next_importance = results[1].get("importance", 0.0)

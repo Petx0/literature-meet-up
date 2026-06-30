@@ -138,6 +138,12 @@ create table locations (
   -- Addendum 4: geocoding backfill outcome
   geocode_status geocode_status_enum not null default 'skipped',
 
+  -- has literature_meetup/location_normalization.py looked at this row's
+  -- country value yet (true whether or not it actually changed anything) -
+  -- lets a re-run process only rows added since the last pass, or every
+  -- real-location row again via --force
+  country_normalized boolean not null default false,
+
   created_at timestamptz not null default now(),
 
   -- a transit location must have at least one of from/to populated, and must
