@@ -144,6 +144,13 @@ create table locations (
   -- real-location row again via --force
   country_normalized boolean not null default false,
 
+  -- has a human manually reviewed this row's country/region/city hierarchy
+  -- for plausibility against the book's known setting? set true by
+  -- scripts/normalize_locations.py --mark-reviewed after a review pass;
+  -- false for any location added by a newly-processed book, so a reviewer
+  -- can filter to only the unreviewed rows next time
+  location_reviewed boolean not null default false,
+
   created_at timestamptz not null default now(),
 
   -- a transit location must have at least one of from/to populated, and must
