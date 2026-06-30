@@ -121,3 +121,18 @@ h1 {
   color: #8a8070;
   margin-top: 0.8rem;
 }
+
+#map {
+  height: 320px;
+  margin-top: 1.5rem;
+  border: 1px solid #ddd3c0;
+  border-radius: 8px;
+}
+
+.no-pin-note {
+  margin: 0.4rem 0 0 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  color: #8a8070;
+  font-style: italic;
+}

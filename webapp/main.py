@@ -19,6 +19,7 @@ from literature_meetup.encounter_queries import (
     list_countries,
     random_encounter,
 )
+from literature_meetup.geocoding_live import geocode_one
 
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 if ENV_PATH.exists():
@@ -76,7 +77,29 @@ def api_encounter(
 
     if encounter is None:
         return {"found": False}
+
+    encounter["lat_a"], encounter["lon_a"] = _geocode_side(encounter, "a")
+    encounter["lat_b"], encounter["lon_b"] = _geocode_side(encounter, "b")
     return {"found": True, "encounter": encounter}
+
+
+def _geocode_side(encounter: dict, suffix: str) -> tuple[float | None, float | None]:
+    """Geocodes one side of an encounter for the map. Skips fictional
+    locations outright (geocoding them would just waste a Nominatim call);
+    for transit (journey) locations uses the destination, not the origin,
+    since that's where the event narratively lands."""
+    location_type = encounter.get(f"location_type_{suffix}")
+    if location_type == "fictional":
+        return None, None
+    if location_type == "transit":
+        country = encounter.get(f"transit_to_country_{suffix}")
+        city = encounter.get(f"transit_to_city_{suffix}")
+        region = None
+    else:
+        country = encounter.get(f"country_{suffix}")
+        region = encounter.get(f"region_{suffix}")
+        city = encounter.get(f"city_{suffix}")
+    return geocode_one(country, region, city) or (None, None)
 
 
 app.mount("/", StaticFiles(directory=Path(__file__).resolve().parent / "static", html=True), name="static")

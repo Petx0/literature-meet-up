@@ -78,7 +78,13 @@ select
             || e.time_year_range_start || '-' || e.time_year_range_end
         else 'an unknown time'
     end as readable_time,
-    e.evidence_quote
+    e.evidence_quote,
+    l.location_type,
+    l.country,
+    l.region,
+    l.city,
+    l.transit_to_country,
+    l.transit_to_city
 from events e
 join books b on b.id = e.book_id
 join characters c on c.id = e.character_id
@@ -108,8 +114,12 @@ with raw_pairs as (
     select
         p1.character_id as character_a_id, r1.character_name as character_a, r1.book_title as book_a,
         r1.readable_location as location_a, r1.readable_time as time_a, r1.evidence_quote as evidence_a,
+        r1.location_type as location_type_a, r1.country as country_a, r1.region as region_a, r1.city as city_a,
+        r1.transit_to_country as transit_to_country_a, r1.transit_to_city as transit_to_city_a,
         p2.character_id as character_b_id, r2.character_name as character_b, r2.book_title as book_b,
-        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b
+        r2.readable_location as location_b, r2.readable_time as time_b, r2.evidence_quote as evidence_b,
+        r2.location_type as location_type_b, r2.country as country_b, r2.region as region_b, r2.city as city_b,
+        r2.transit_to_country as transit_to_country_b, r2.transit_to_city as transit_to_city_b
     from event_match_points p1
     join event_match_points p2 on p1.book_id < p2.book_id
     join event_readable r1 on r1.event_id = p1.event_id
@@ -121,7 +131,9 @@ with raw_pairs as (
 grouped as (
     select distinct on (character_a_id, character_b_id, location_a, time_a, location_b, time_b)
         character_a, book_a, location_a, time_a, evidence_a,
+        location_type_a, country_a, region_a, city_a, transit_to_country_a, transit_to_city_a,
         character_b, book_b, location_b, time_b, evidence_b,
+        location_type_b, country_b, region_b, city_b, transit_to_country_b, transit_to_city_b,
         count(*) over (
             partition by character_a_id, character_b_id, location_a, time_a, location_b, time_b
         ) as support_count
@@ -205,6 +217,13 @@ def random_encounter(conn, time_granularity: str, location_granularity: str, cou
     otherwise both dominate the random draw and show up as many near-duplicate
     "encounters". The returned dict's `support_count` is how many raw
     event-pairs collapsed into the one returned, as a rough confidence signal.
+
+    The returned dict also carries raw, un-rendered location fields per side
+    (`location_type_a/b`, `country_a/b`, `region_a/b`, `city_a/b`,
+    `transit_to_country_a/b`, `transit_to_city_a/b`) alongside the existing
+    human-readable `location_a/b` strings - these exist purely so callers
+    (webapp/main.py) can feed a structured query into a geocoder without
+    re-parsing `readable_location` text.
     """
     time_condition = _time_condition(time_granularity)
     location_condition = _location_condition(location_granularity)
