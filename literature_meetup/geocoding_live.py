@@ -27,7 +27,7 @@ ACCEPTABLE_ADDRESSTYPES_BY_LEVEL = {
 }
 IMPORTANCE_MARGIN = 0.05
 
-_cache: dict[tuple[str, str], tuple[float, float] | None] = {}
+_cache: dict[tuple[str | None, str | None, str | None], tuple[float, float] | None] = {}
 _rate_limit_lock = threading.Lock()
 _last_call_time = 0.0
 
@@ -65,38 +65,41 @@ def _accept_result(results: list[dict], level: str) -> dict | None:
 
 
 def geocode_one(country: str | None, region: str | None, city: str | None) -> tuple[float, float] | None:
-    """Returns (lat, lon) for the deepest non-null of city > region > country,
-    or None if all three are null or the lookup fails/is ambiguous. Never
-    raises - geocoding is best-effort decoration for the map, not something
-    that should ever break /api/encounter.
+    """Returns (lat, lon) for the given place, or None if there's nothing to
+    look up or the lookup fails/is ambiguous. Never raises - geocoding is
+    best-effort decoration for the map, not something that should ever break
+    /api/encounter.
+
+    Sends every non-null level (city/region/country) to Nominatim together,
+    not just the deepest one - a bare city name like "Savannah" matches many
+    real places, and dropping the country/region context that's already
+    known (rather than relying on it solely to validate the result
+    afterwards) is what was producing false "no pin available" results for
+    otherwise unambiguous, well-known places.
     """
-    if city:
-        level, value = "city", city
-    elif region:
-        level, value = "region", region
-    elif country:
-        level, value = "country", country
-    else:
+    if not city and not region and not country:
         return None
 
-    cache_key = (level, value)
+    cache_key = (country, region, city)
     if cache_key in _cache:
         return _cache[cache_key]
 
+    deepest_level = "city" if city else "region" if region else "country"
     params = {"format": "json", "addressdetails": 1, "limit": 5}
-    structured_param = STRUCTURED_PARAM_BY_LEVEL.get(level)
-    if structured_param:
-        params[structured_param] = value
-    else:
-        params["q"] = value
+    if country:
+        params[STRUCTURED_PARAM_BY_LEVEL["country"]] = country
+    if region:
+        params[STRUCTURED_PARAM_BY_LEVEL["region"]] = region
+    if city:
+        params[STRUCTURED_PARAM_BY_LEVEL["city"]] = city
 
     try:
         results = _throttled_get(params)
     except requests.RequestException as exc:
-        print(f"live geocode lookup failed for {level}={value!r}: {exc}")
+        print(f"live geocode lookup failed for {params!r}: {exc}")
         return None
 
-    accepted = _accept_result(results, level)
+    accepted = _accept_result(results, deepest_level)
     if accepted is None:
         _cache[cache_key] = None
         return None

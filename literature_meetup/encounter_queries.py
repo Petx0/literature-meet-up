@@ -192,11 +192,25 @@ def _location_condition(granularity: str) -> str:
 
 
 def list_countries(conn) -> list[str]:
-    """Distinct countries that appear on at least one event eligible for
-    matching (joins the same event_match_points view random_encounter() uses,
-    so the dropdown this feeds never offers a country with zero results)."""
+    """Distinct countries that have at least one *encounter* - a cross-book
+    pair of events both in that country - not just countries that merely
+    appear on some event. Ignores the time/location granularity controls
+    (always checked at "same country" / no time filter) since this populates
+    a dropdown shown before either is chosen; a country listed here may still
+    return zero results under stricter granularities, but never under the
+    most permissive ones - it's a floor, not a guarantee.
+    """
     with conn.cursor() as cur:
-        cur.execute("select distinct country from event_match_points where country is not null order by country")
+        cur.execute(
+            """
+            select distinct p1.country
+            from event_match_points p1
+            join event_match_points p2
+              on p1.book_id < p2.book_id and p1.country = p2.country
+            where p1.country is not null
+            order by p1.country
+            """
+        )
         return [row[0] for row in cur.fetchall()]
 
 
