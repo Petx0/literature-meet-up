@@ -63,21 +63,36 @@ def _query_nominatim(level: str, value: str) -> list[dict]:
 
 def _dedupe_same_place(results: list[dict]) -> list[dict]:
     """Nominatim can return one real place as several separate OSM boundary
-    records (e.g. Paris as both a 'city' and a 'suburb', with identical
-    importance) - these aren't genuinely ambiguous candidates, just multiple
-    representations of the same place, and were making the importance-margin
-    check below wrongly reject unambiguous, well-known places. Collapses by
-    display_name, keeping each name's first (most relevant, per Nominatim's
-    own ordering) occurrence."""
-    seen = set()
+    records with identical importance - these aren't genuinely ambiguous
+    candidates, just multiple representations of the same place.
+
+    Two passes:
+    1. Exact display_name dedup (handles Paris as 'city' and 'suburb').
+    2. address.city + address.country dedup (handles a city appearing as both
+       its administrative boundary and a postal-code district, e.g. Valladolid
+       returning with and without '47003' in the display_name)."""
+    seen_name: set = set()
     deduped = []
     for result in results:
         name = result.get("display_name")
-        if name in seen:
+        if name in seen_name:
             continue
-        seen.add(name)
+        seen_name.add(name)
         deduped.append(result)
-    return deduped
+
+    seen_place: set = set()
+    collapsed = []
+    for result in deduped:
+        addr = result.get("address") or {}
+        city = addr.get("city") or addr.get("town") or addr.get("village")
+        country = addr.get("country")
+        if city and country:
+            key = (city, country)
+            if key in seen_place:
+                continue
+            seen_place.add(key)
+        collapsed.append(result)
+    return collapsed
 
 
 def _accept_result(results: list[dict], level: str) -> dict | None:
