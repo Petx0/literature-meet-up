@@ -98,6 +98,38 @@ translation.
     usual multi-year stories
 27. **#4217** — A Portrait of the Artist as a Young Man — multi-year Bildungsroman
 
+## Fourth batch (added 2026-06-30)
+
+Selected for geographic diversity — introducing Spain and Germany for the first time,
+deepening the Paris and Russian clusters, and adding two more Dickens/James titles.
+All run with `CHAPTER_SAMPLE_PCT=50` (first half of chapters only) and
+`TARGET_CHARACTERS_AUTO_DISCOVER=true` / `TARGET_CHARACTERS_TOP_N=5` (Wikidata top-5
+cast per book, falling back to unrestricted extraction when no Wikidata match exists).
+
+Both Gil Blas and The Portrait of a Lady are only available on Project Gutenberg split
+across multiple volumes; Volume 1 is used in each case, consistent with the 50% sampling.
+
+28. **#2465** — Carmen (Mérimée) — Seville, Córdoba, Granada, Gibraltar border. Short
+    novella; first Spanish geography in corpus. Fast, clean extraction.
+29. **#66677** — The Adventures of Gil Blas of Santillane, Vol. 1 (Le Sage) — cross-Spain
+    picaresque road novel (Santillana → Oviedo → Valladolid → Madrid). Strong travel
+    structure; first volume of three on PG.
+30. **#2527** — The Sorrows of Young Werther (Goethe) — Rhine Valley, Wetzlar. Very short
+    epistolary novel; dated letters give unusually precise time anchoring. First German
+    geography in corpus.
+31. **#1237** — Père Goriot (Balzac) — Paris, 1819. Same streets as Dumas and Hugo novels
+    already in DB — highest cross-book meetup density of anything added in this batch.
+32. **#2413** — Madame Bovary (Flaubert) — Normandy provincial towns (Rouen, Yonville).
+    Contrast to the Paris-heavy French cluster; first Flaubert in corpus.
+33. **#2638** — The Idiot (Dostoevsky) — St. Petersburg / Switzerland. Pairs with Crime
+    and Punishment (batch 2, same city). ~50 sections, well under MAX_CHAPTERS.
+34. **#1081** — Dead Souls (Gogol) — Rural Russia road novel; contrast to the St.
+    Petersburg cluster. First Gogol in corpus.
+35. **#766** — David Copperfield (Dickens) — London / Kent / Dover / Suffolk. 64 chapters
+    confirmed; pairs with A Tale of Two Cities and Great Expectations already in DB.
+36. **#2833** — The Portrait of a Lady, Vol. 1 (Henry James) — England / Florence / Rome.
+    Florence overlap with A Room with a View (already in DB); first volume of two on PG.
+
 ## Cross-book meetup potential
 
 - **Dumas universe** (#1184, #1257, #2759): overlapping characters (Athos, Aramis,
@@ -115,3 +147,14 @@ translation.
 - **Ancient-world cluster** (#2145, #2853, #1565): Ben-Hur, Quo Vadis, and The Last
   Days of Pompeii all sit in the 1st century AD across the Roman Mediterranean —
   real meetup candidates if their date ranges and locations overlap.
+- **Paris mega-cluster** (#1184, #1257, #2759, #60, #2610, #1237): Père Goriot (1819
+  Paris) joins Dumas, Hugo, and The Scarlet Pimpernel — the densest same-city
+  cross-book meetup cluster in the corpus.
+- **Spain founding cluster** (#2465, #66677): Carmen and Gil Blas are the first Spanish
+  books in the corpus; no existing meetup candidates yet, but they seed the geography.
+- **Russia St. Petersburg** (#2638, #2554): The Idiot and Crime and Punishment — same
+  city, overlapping era (1860s), strongest candidate for an immediate Russian meetup.
+- **Italy / Florence** (#2833, #2641): Portrait of a Lady Vol. 1 and A Room with a View
+  both place characters in Florence; likely meetup candidates once both are processed.
+- **Dickens London** (#766, #1400, #1400): David Copperfield + A Tale of Two Cities +
+  Great Expectations share London geography across different decades.

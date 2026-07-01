@@ -49,12 +49,21 @@ CORPUS = [
     (145, "Middlemarch"),
     (143, "The Mayor of Casterbridge"),
     (541, "The Age of Innocence"),
-    (2600, "War and Peace"),
-    (1399, "Anna Karenina"),
+    #(2600, "War and Peace"),
+    #(1399, "Anna Karenina"),
     (74, "The Adventures of Tom Sawyer"),
     (120, "Treasure Island"),
     (244, "A Study in Scarlet"),
     (4217, "A Portrait of the Artist as a Young Man"),
+    (2465, "Carmen"),
+    (66677, "Gil Blas Vol. 1 (Le Sage)"),
+    (2527, "Sorrows of Young Werther"),
+    (1237, "Père Goriot"),
+    (2413, "Madame Bovary"),
+    (2638, "The Idiot"),
+    (1081, "Dead Souls"),
+    (766, "David Copperfield"),
+    (2833, "Portrait of a Lady Vol. 1")
 ]
 
 
