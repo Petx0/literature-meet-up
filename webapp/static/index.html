@@ -13,29 +13,35 @@
     <p class="subtitle">Find characters from different novels who could have crossed paths.</p>
 
     <div class="controls">
-      <label for="time-select">Time overlap</label>
-      <select id="time-select">
-        <option value="none">No time filter</option>
-        <option value="century">Same century</option>
-        <option value="decade">Same decade</option>
-        <option value="year" selected>Same year</option>
-        <option value="month">Same month</option>
-        <option value="day">Same day</option>
-      </select>
+      <div class="filter-group">
+        <label for="time-select">Time overlap</label>
+        <select id="time-select">
+          <option value="none" selected>No time filter</option>
+          <option value="century">Same century</option>
+          <option value="decade">Same decade</option>
+          <option value="year">Same year</option>
+          <option value="month">Same month</option>
+          <option value="day">Same day</option>
+        </select>
+      </div>
 
-      <label for="location-select">Location overlap</label>
-      <select id="location-select">
-        <option value="none">No location filter</option>
-        <option value="country">Same country</option>
-        <option value="region">Same region</option>
-        <option value="city" selected>Same city</option>
-        <option value="neighborhood">Same neighbourhood</option>
-      </select>
+      <div class="filter-group">
+        <label for="location-select">Location overlap</label>
+        <select id="location-select">
+          <option value="none" selected>No location filter</option>
+          <option value="country">Same country</option>
+          <option value="region">Same region</option>
+          <option value="city">Same city</option>
+          <option value="neighborhood">Same neighbourhood</option>
+        </select>
+      </div>
 
-      <label for="country-select">Country</label>
-      <select id="country-select">
-        <option value="" selected>Any country</option>
-      </select>
+      <div class="filter-group">
+        <label for="country-select">Country</label>
+        <select id="country-select">
+          <option value="" selected>Any country</option>
+        </select>
+      </div>
 
       <button id="find-btn">Find an encounter</button>
     </div>
