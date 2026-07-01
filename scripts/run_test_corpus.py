@@ -58,7 +58,8 @@ CORPUS = [
     (2465, "Carmen"),
     (66677, "Gil Blas Vol. 1 (Le Sage)"),
     (2527, "Sorrows of Young Werther"),
-    (1237, "Père Goriot"),
+    #(1237, "Père Goriot"),  # PG #1237 has no chapter headings (continuous prose) — pipeline extracts nothing
+
     (2413, "Madame Bovary"),
     (2638, "The Idiot"),
     (1081, "Dead Souls"),
